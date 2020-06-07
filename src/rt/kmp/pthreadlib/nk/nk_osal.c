@@ -128,8 +128,10 @@ pte_osResult pte_osMutexUnlock(pte_osMutexHandle handle){
  * @param ppte_osThreadHandle set to the handle of the new thread.
  *
  * @return PTE_OS_OK - New thread successfully created.
- * @return PTE_OS_NO_RESOURCESs - Insufficient resources to create thread
+ * @return PTE_OS_NO_RESOURCES - Insufficient resources to create thread
  */
+
+static int cur_cpu = 0;
 pte_osResult pte_osThreadCreate(pte_osThreadEntryPoint entryPoint,
                                 int stackSize,
                                 int initialPriority,
@@ -140,10 +142,16 @@ pte_osResult pte_osThreadCreate(pte_osThreadEntryPoint entryPoint,
   //pte_osThreadhandle will be nk_thread_id
   pte_osThreadHandle handleobj = malloc(sizeof(struct thread_with_signal));
   memset(handleobj,0,sizeof(struct thread_with_signal));
+
+  //round robin
+  //int cpus =  nk_get_num_cpus();
+  //ERROR("CPUS %d\n", cpus);
+  //cur_cpu = cur_cpu+1 % cpus;
   int ret = nk_thread_create(entryPoint, argv, NULL, false,(nk_stack_size_t) stackSize, &(handleobj->tid),-1);
   if (ret != 0){
-    DEBUG("create error exit\n");
-    nk_thread_exit(NULL);
+    ERROR("create error exit\n");
+    return PTE_OS_NO_RESOURCES;
+    //nk_thread_exit(NULL);
   }
   *handle = handleobj;
   struct nk_thread* thread = (struct nk_thread*) (*handle)->tid;
@@ -569,10 +577,10 @@ pte_osResult pte_osTlsFree(unsigned int key){
  */
 int pte_osAtomicExchange(int *pTarg, int val){
 
-  int origin = *pTarg;
-  __atomic_exchange_n(pTarg,val,__ATOMIC_SEQ_CST);
-  DEBUG("AtomicEXCHANGE, ORIG %d , NOW %d val %d ret %d\n", origin, *pTarg, val);
-  return origin;
+  //int origin = *pTarg;
+  return __atomic_exchange_n(pTarg,val,__ATOMIC_SEQ_CST);
+  //DEBUG("AtomicEXCHANGE, ORIG %d , NOW %d val %d ret %d\n", origin, *pTarg, val);
+  //return origin;
     //return *((int*) xchg64((void**)(&pTarg),(void*)(&val)));
 }
 

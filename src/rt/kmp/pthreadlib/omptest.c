@@ -2,6 +2,7 @@
 #include <nautilus/shell.h>
 #include <nautilus/libccompat.h>
 #include <nautilus/random.h>
+#include <nautilus/scheduler.h>
 #ifndef NAUT_CONFIG_DEBUG_GPUDEV
 #undef DEBUG_PRINT
 #define DEBUG_PRINT(fmt, args...) 
@@ -131,7 +132,7 @@ void ompgauss() {
   #pragma omp parallel private(col, row,norm, multiplier) num_threads(procs)
   for (norm = 0; norm < N - 1; norm++) {
   {
-#pragma omp for schedule(static,1)
+#pragma omp for schedule(dynamic)
       for (row = norm + 1; row < N; row++) {
 
         multiplier = A[row][norm] / A[norm][norm];
@@ -140,7 +141,7 @@ void ompgauss() {
             A[row][col] -= A[norm][col] * multiplier;
         }
         B[row] -= B[norm] * multiplier;
-        int id = getpid();
+        //int id = getpid();
 	//printf("tid:%d, B[%d]: %f ", id,row, B[row]);
       }
   }
@@ -159,7 +160,7 @@ void ompgauss() {
 }
 
 
-
+#define TIME() (double)nk_sched_get_realtime()/1e9;
 static int handle_omptest (char * buf, void * priv)
 {
 
@@ -175,28 +176,28 @@ static int handle_omptest (char * buf, void * priv)
     nk_vc_printf("seed %d, size, %d, nprocs: %d\n", seed, N, procs);
     initialize_inputs();
     reset_inputs();
-    uint64_t start = (unsigned int) time(NULL);
+    double start = TIME();
     ompgauss();
-    uint64_t  end = (unsigned int) time(NULL);
-    uint64_t omp = end-start;
-    nk_vc_printf("openmp done\n");
+    double  end = TIME();
+    double  omp = end-start;
+    nk_vc_printf("openmp done %lf\n", omp);
     float OMP[N];
     for(int row =0; row<N; row++){
       OMP[row] = X[row];
     }
 
     reset_inputs();
-    start = (uint64_t) time(NULL);
+    start = TIME();
     serialgauss();
-    end = (uint64_t) time(NULL);
-    uint64_t serial = end-start;
-    nk_vc_printf("serial done ");
+    end = TIME();
+    double serial = end-start; 
+    nk_vc_printf("serial done %lf\n", serial);
     float difference = 0.0;
     for(int row =0; row<N; row++){
       difference += (OMP[row]- X[row]);
     }
 
-    nk_vc_printf("OMP difference %f!\n", difference);
+    nk_vc_printf("OMP difference %f speed up %f !\n", difference, serial/omp);
     return 0;
 
 }

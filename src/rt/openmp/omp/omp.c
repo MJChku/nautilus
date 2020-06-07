@@ -23,12 +23,18 @@
 
 
 #include <nautilus/nautilus.h>
+#include <nautilus/env.h>
 #include <rt/openmp/omp/omp.h>
+
 #define DEBUG(fmt, args...) DEBUG_PRINT("pthread_init: " fmt, ##args)
+#define KMP_ENV "KMP"
+
 extern int pthread_init(void);
+
 int nk_openmp_init()	
 {   
-   
+    char name[]=KMP_ENV;
+    nk_env_create(name, 64, 256, 256);
     pthread_init();
     DEBUG("****pthread init ****\n");
     return 0;

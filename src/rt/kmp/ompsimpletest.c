@@ -14,10 +14,7 @@ extern int pthread_init(void);
 static int handle_gputest (char * buf, void * priv)
 {
     int i;
-    if (0 != pthread_init()){
-     ERROR("pthread initilize failed\n");
-    }
-    #pragma omp parallel num_threads(10)
+    #pragma omp parallel
     {
       
       /* long id = getpid(); */

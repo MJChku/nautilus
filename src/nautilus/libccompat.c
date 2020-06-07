@@ -37,7 +37,11 @@
 #include <nautilus/errno.h>
 #include <nautilus/random.h>
 #include <dev/hpet.h>
-
+#include <rt/openmp/openmp.h>
+#include <nautilus/env.h>
+//kmp
+#include <nautilus/spinlock.h>
+#include <nautilus/sysconf.h>
 
 int errno=0;
 
@@ -198,13 +202,13 @@ __assert_fail (const char * assertion, const char * file, unsigned line, const c
             __builtin_return_address(0));
 }
 
-
-int 
-vfprintf (FILE * stream, const char * format, va_list arg)
-{
-    UNDEF_FUN_ERR();
-    return -1;
-}
+//omp need this
+/* int */
+/* vfprintf (FILE * stream, const char * format, va_list arg) */
+/* { */
+/*    UNDEF_FUN_ERR(); */
+/*    return -1; */
+/* } */
 
 
 int 
@@ -359,12 +363,13 @@ fdopen (int fd, const char * mode)
     return NULL;
 }
 
-char *getenv(const char *name)
-{
+//omp need this 
+//char *getenv(const char *name)
+//{
 
-    UNDEF_FUN_ERR();
-    return NULL;
-}
+//    UNDEF_FUN_ERR();
+//    return NULL;
+//}
 //For LUA Support
 clock_t clock()
 {
@@ -574,6 +579,17 @@ ioctl (int d, unsigned long request, ...)
 int 
 syscall (int number, ...)
 {
+
+  int msr = 0;
+  /* asm volatile ( "rdtsc\n\t"    // Returns the time in EDX:EAX. */
+  /*            "shl $32, %%rdx\n\t"  // Shift the upper bits left. */
+  /*            "or %%rdx, %0"        // 'Or' in the lower bits. */
+  /*            : "=a" (msr) */
+  /*            : */
+  /*            : "rdx"); */
+  /* __asm__ __volatile__("movq $0x1, %%rcx\n\t" */
+  /*  "sub %%rcx,%%fs\n\t" */
+  /*  "movq %%rdx,%%fs"); */
     UNDEF_FUN_ERR();
     return -1;
 }
@@ -811,6 +827,7 @@ double exp(double x)
 return x;
 }
 
+
 /* became lazy... */
 GEN_DEF(writev)
 GEN_DEF(ungetwc)
@@ -857,9 +874,9 @@ GEN_DEF(__towupper_l)
 GEN_DEF(__uselocale)
 GEN_DEF(__strftime_l)
 GEN_DEF(mbsnrtowcs)
-GEN_DEF(pthread_mutex_init)
-GEN_DEF(pthread_mutex_lock)
-GEN_DEF(pthread_mutex_unlock)
+//GEN_DEF(pthread_mutex_init)
+//GEN_DEF(pthread_mutex_lock)
+//GEN_DEF(pthread_mutex_unlock)
 GEN_DEF(wcscoll)
 //GEN_DEF(strcoll)
 GEN_DEF(towupper)
@@ -891,63 +908,282 @@ GEN_DEF(__divdc3)
 GEN_DEF(__divsc3)
 
 
+/* define omp function */
+
+#define ERROR(fmt, args...) ERROR_PRINT("kmp: " fmt, ##args)
+#define DEBUG(fmt, args...)
+#define INFO(fmt, args...)   INFO_PRINT("kmp: " fmt, ##args)
+
+
+#define DEBUG(fmt, args...)
+#ifdef NAUT_CONFIG_OPENMP_RT_DEBUG
+#undef DEBUG
+#define DEBUG(fmt, args...) DEBUG_PRINT("kmp: " fmt, ##args)
+#endif
+
+static spinlock_t env_list_lock;
+#define STATE_LOCK_CONF uint8_t _state_lock_flags
+#define STATE_LOCK() _state_lock_flags = spin_lock_irq_save(&env_list_lock)
+#define STATE_UNLOCK() spin_unlock_irq_restore(&env_list_lock, _state_lock_flags)
+
+unsigned long getpid(void){
+  nk_thread_t * t = (nk_thread_t*)get_cur_thread();
+  DEBUG("threadid %d\n", t->tid);
+  return t->tid;
+ }
+
+#define suseconds_t uint64_t
+struct timeval {
+     time_t      tv_sec;     /* seconds */
+     suseconds_t tv_usec;    /* microseconds */
+};
+
+struct timeval gettimeofday(void){
+  struct timeval timeofday = {0,0};
+  return timeofday;
+}
+
+#define MAX_ENV 50
+
+typedef struct env_val{
+  char name[MAX_ENV];
+  char value[MAX_ENV];
+  struct list_head list_node;
+} env_val;
+
+static struct list_head env_list;
+static int init_env = 0;
+
+void insert_env_list(char* name, char*value){
+   env_val *new_env;
+   new_env = malloc(sizeof(*new_env));
+   memset(new_env, 0, sizeof(*new_env));
+   strncpy(new_env->name, name,MAX_ENV);
+   strncpy(new_env->value,value,MAX_ENV);
+   INIT_LIST_HEAD(&new_env->list_node);
+   STATE_LOCK_CONF;
+   STATE_LOCK();
+   list_add_tail(&new_env->list_node, &env_list);
+   DEBUG("set  %s, %s\n",name,value);
+   STATE_UNLOCK();
+}
+
+
+int setenv(const char *name, const char *value, int overwrite){
+
+  
+  if(init_env == 0){
+    INIT_LIST_HEAD(&env_list);
+    insert_env_list("LANG", "en_HK.UTF-8");
+    init_env = 1;
+  }
+  env_val *new_env;
+  new_env = malloc(sizeof(*new_env));
+  memset(new_env, 0, sizeof(*new_env));
+  strncpy(new_env->name, name,MAX_ENV);
+  strncpy(new_env->value,value,MAX_ENV);
+  //new_env->value = value;
+  INIT_LIST_HEAD(&new_env->list_node);
+  STATE_LOCK_CONF;
+  STATE_LOCK();
+  list_add_tail(&new_env->list_node, &env_list);
+  DEBUG("set  %s, %s\n",name,value);
+  STATE_UNLOCK();
+  /* if(overwrite){ */
+
+  /* } */
+  return 0;
+
+}
+
+
+char *getenv(const char *name)
+{
+  char* target;
+  struct list_head *cur;
+  STATE_LOCK_CONF;
+  STATE_LOCK();
+  list_for_each(cur, &env_list){
+    //name equals
+    //DEBUG("list %s\n", list_entry(cur, struct env_val,list_node)->value);
+    if(!strcmp(list_entry(cur, struct env_val,list_node)->name,name)){
+      target = list_entry(cur, struct env_val, list_node)->value;
+      break;
+    }
+  }
+
+  STATE_UNLOCK();
+  DEBUG("get %s, %s\n",name,target );
+  return target;
+
+    DEBUG("getenv %s\n", name);
+    // UNDEF_FUN_ERR();
+}
+
+//#define environ  (*_environ())
+
+char ***nk_environ(void){
+
+  char** __environ;
+  int count=0;
+  struct list_head *cur;
+  STATE_LOCK_CONF;
+  STATE_LOCK();
+  list_for_each(cur, &env_list){
+    count++;
+  }
+  __environ =  malloc(sizeof(char*)*count);
+  int i = 0;
+  list_for_each(cur, &env_list){
+      __environ[i] = list_entry(cur, struct env_val, list_node)->name;
+      i++;
+  }
+
+  STATE_UNLOCK();
+  return &__environ;
+}
+
+/* static char** environ; */ 
+
+/* int setenv(const char *name, const char *value, int overwrite){ */
+
+/*     struct nk_env *ptr; */
+/*     nk_env_insert(ptr ,name,value); */
+/*     DEBUG("set  %s, %s\n",name,value); */
+/*     return 0;  */
+/* } */
+
+
+
+/* char *getenv(const char *name){ */
+/*   struct nk_env * ptr = nk_env_find(name); */
+/*   DEBUG("get %s, %s\n",name, ptr->data ); */
+/*   return ptr->data; */
+
+/* } */
+char*  UNCONSTCHAR(const char* s) {
+    int i; 
+    char* res;
+    for (i = 0; s[i] != '\0'; i++) { 
+        res[i] = s[i]; 
+    } 
+    res[i] = '\0'; 
+    return res;
+}					       
+ 
+int 
+vfprintf (FILE * stream, const char * format, va_list arg)
+{
+    //char *fmt;
+    //malloc()
+      //fmformat
+   DEBUG("====");
+   #ifdef NAUT_CONFIG_OPENMP_RT_DEBUG
+   nk_vc_printf(format,arg);
+   #endif
+   //nk_vc_printf(format,);
+    return 0;
+    // return -1;
+}
+
+/* int sched_yield(void){ */
+  
+/*   nk_yield(); */
+/*   return 0; */
+/* } */
+
+long sysconf(int name){
+  //DEBUG("sysconf, %d",name);
+  long conf = __sysconf(name);
+  return conf;
+}
+
+#define rlim_t uint32_t
+struct rlimit {
+       rlim_t rlim_cur;  /* Soft limit */
+       rlim_t rlim_max;  /* Hard limit (ceiling for rlim_cur) */
+};
+
+int getrlimit(int resource, struct rlimit *rlim){
+  DEBUG("getrlimit %d\n", resource); 
+  rlim->rlim_cur = 0xF000;
+  rlim->rlim_max = 0xF000;
+  return 0;
+}
+char* strerror_r(int errnum, char* buf, size_t buflen){
+  memcpy(buf, 'e', sizeof(buflen));
+  return buf;
+}
+/* void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)){ */
+/*   //empty */
+
+/* } */
+
+
 // Other stuff KMP needs, for a start
-GEN_DEF(atexit)
+
+int atomic_load_explicit(void *ptr ,int mmodel){
+  DEBUG("calls into atomic_load_explicit\n");
+  return 1;//__sync_fetch_and_or(ptr,0);
+}
+
+
 GEN_DEF(catclose)
 GEN_DEF(catgets)
 GEN_DEF(catopen)
 GEN_DEF(close)
 GEN_DEF(closedir)
 GEN_DEF(dlsym)
-GEN_DEF(environ)
+//GEN_DEF(atexit)
+//GEN_DEF(environ)
 GEN_DEF(fgetc)
 GEN_DEF(gethostname)
-GEN_DEF(getpid)
-GEN_DEF(getrlimit)
+//GEN_DEF(getpid)
+//GEN_DEF(getrlimit)
 GEN_DEF(getrusage)
-GEN_DEF(gettimeofday)
+//GEN_DEF(gettimeofday)
 GEN_DEF(open)
 GEN_DEF(opendir)
-GEN_DEF(pthread_atfork)
-GEN_DEF(pthread_attr_destroy)
-GEN_DEF(pthread_attr_getstack)
-GEN_DEF(pthread_attr_init)
-GEN_DEF(pthread_attr_setdetachstate)
-GEN_DEF(pthread_attr_setstacksize)
-GEN_DEF(pthread_cancel)
-GEN_DEF(pthread_cond_destroy)
-GEN_DEF(pthread_cond_init)
-GEN_DEF(pthread_cond_signal)
-GEN_DEF(pthread_cond_wait)
-GEN_DEF(pthread_condattr_init)
-GEN_DEF(pthread_create)
-GEN_DEF(pthread_exit)
-GEN_DEF(pthread_getattr_np)
-GEN_DEF(pthread_getspecific)
-GEN_DEF(pthread_join)
-GEN_DEF(pthread_key_create)
-GEN_DEF(pthread_key_delete)
-GEN_DEF(pthread_mutex_destroy)
-GEN_DEF(pthread_mutex_trylock)
-GEN_DEF(pthread_mutexattr_init)
-GEN_DEF(pthread_self)
-GEN_DEF(pthread_setcancelstate)
-GEN_DEF(pthread_setcanceltype)
-GEN_DEF(pthread_setspecific)
-GEN_DEF(qsort)
+//GEN_DEF(pthread_atfork)
+//GEN_DEF(pthread_attr_destroy)
+//GEN_DEF(pthread_attr_getstack)
+//GEN_DEF(pthread_attr_init)
+//GEN_DEF(pthread_attr_setdetachstate)
+//GEN_DEF(pthread_attr_setstacksize)
+//GEN_DEF(pthread_cancel)
+//GEN_DEF(pthread_cond_destroy)
+//GEN_DEF(pthread_cond_init)
+//GEN_DEF(pthread_cond_signal)
+//GEN_DEF(pthread_cond_wait)
+//GEN_DEF(pthread_condattr_init)
+//GEN_DEF(pthread_create)
+//GEN_DEF(pthread_exit)
+//GEN_DEF(pthread_getattr_np)
+//GEN_DEF(pthread_getspecific)
+//GEN_DEF(pthread_join)
+//GEN_DEF(pthread_key_create)
+//GEN_DEF(pthread_key_delete)
+//GEN_DEF(pthread_mutex_destroy)
+//GEN_DEF(pthread_mutex_trylock)
+//GEN_DEF(pthread_mutexattr_init)
+//GEN_DEF(pthread_self)
+//GEN_DEF(pthread_setcancelstate)
+//GEN_DEF(pthread_setcanceltype)
+//GEN_DEF(pthread_setspecific)
+//GEN_DEF(qsort)
 GEN_DEF(readdir)
-GEN_DEF(sched_yield)
-GEN_DEF(setenv)
-GEN_DEF(sigaction)
+//GEN_DEF(sched_yield)
+//GEN_DEF(setenv)
+//GEN_DEF(sigaction)
 GEN_DEF(sigaddset)
 GEN_DEF(sigdelset)
-GEN_DEF(sigemptyset)
+//GEN_DEF(sigemptyset)
 GEN_DEF(sigfillset)
 GEN_DEF(sigismember)
 GEN_DEF(sleep)
-GEN_DEF(strerror_r)
+//GEN_DEF(strerror_r)
 GEN_DEF(strtok_r)
-GEN_DEF(sysconf)
+//GEN_DEF(sysconf)
 GEN_DEF(times)
 GEN_DEF(unsetenv)
 GEN_DEF(vfscanf)

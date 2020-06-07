@@ -25,6 +25,7 @@
 
 // Run-time startup and shutdown - invoke in init
 // after scheduling is active
+
 int nk_openmp_init();
 void nk_openmp_deinit();
 

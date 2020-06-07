@@ -24,9 +24,13 @@
 
 #include <nautilus/nautilus.h>
 #include <rt/openmp/omp/omp.h>
-
-int nk_openmp_init()
-{
+#define DEBUG(fmt, args...) DEBUG_PRINT("pthread_init: " fmt, ##args)
+extern int pthread_init(void);
+int nk_openmp_init()	
+{   
+   
+    pthread_init();
+    DEBUG("****pthread init ****\n");
     return 0;
 }
 

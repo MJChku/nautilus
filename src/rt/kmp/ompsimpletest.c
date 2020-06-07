@@ -35,8 +35,8 @@ static int handle_gputest (char * buf, void * priv)
 
 
 static struct shell_cmd_impl omptest_impl = {
-    .cmd      = "omptest",
-    .help_str = "openmp test",
+    .cmd      = "ompstest",
+    .help_str = "openmp simple test",
     .handler  = handle_gputest,
 };
 nk_register_shell_cmd(omptest_impl);

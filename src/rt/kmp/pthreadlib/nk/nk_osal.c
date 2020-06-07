@@ -20,18 +20,11 @@
 #define STATE_TRY_LOCK(a,b) spin_try_lock_irq_save(a,b)
 #define STATE_LOCK(a) spin_lock_irq_save(a)
 
-/* #define SEMAPHORE_LOCK_CONF uint8_t _semaphore_lock_flags */
-/* #define SEMAPHORE_LOCK(s) _semaphore_lock_flags = spin_lock_irq_save(&(s)->lock) */
-/* #define SEMAPHORE_TRY_LOCK(s) spin_try_lock_irq_save(&(s)->lock,&_semaphore_lock_flags) */
-/* #define SEMAPHORE_UNLOCK(s) spin_unlock_irq_restore(&(s)->lock, _semaphore_lock_flags) */
-/* #define SEMAPHORE_UNIRQ(s) irq_enable_restore(_semaphore_lock_flags) */
 
 #define poffsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #define pcontainer_of(ptr, type, member) ({                      \
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
         (type *)( (char *)__mptr - offsetof(type,member) );})
-
-
 
 /**
  * Provides a hook for the OSAL to implement any OS specific initialization.  This is guaranteed to be
@@ -456,6 +449,7 @@ pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsign
    if(pTimeout == NULL){
      while(true){
        if(oshandle->signal == NK_THREAD_CANCEL){
+	 DEBUG("pthread cancel exit...\n");
 	 nk_thread_exit(NULL);
          return PTE_OS_INTERRUPTED;
        }
@@ -558,10 +552,6 @@ pte_osResult pte_osTlsFree(unsigned int key){
   nk_tls_key_delete(key);
   return PTE_OS_OK;
 }
-//@}
-
-/** @name Atomic operations */
-//@{
 
 /**
  * Sets the target to the specified value as an atomic operation.
@@ -584,11 +574,6 @@ int pte_osAtomicExchange(int *pTarg, int val){
   DEBUG("AtomicEXCHANGE, ORIG %d , NOW %d val %d ret %d\n", origin, *pTarg, val);
   return origin;
     //return *((int*) xchg64((void**)(&pTarg),(void*)(&val)));
- 
-  // return 0;
-  // return origin;
-  //???
-  // return (int)(ret);
 }
 
 /**
@@ -675,4 +660,12 @@ int ftime(struct timeb *tb){
   tb->dstflag=0;
   return 0;
 }
+
+
+//Not Used
+/* #define SEMAPHORE_LOCK_CONF uint8_t _semaphore_lock_flags */
+/* #define SEMAPHORE_LOCK(s) _semaphore_lock_flags = spin_lock_irq_save(&(s)->lock) */
+/* #define SEMAPHORE_TRY_LOCK(s) spin_try_lock_irq_save(&(s)->lock,&_semaphore_lock_flags) */
+/* #define SEMAPHORE_UNLOCK(s) spin_unlock_irq_restore(&(s)->lock, _semaphore_lock_flags) */
+/* #define SEMAPHORE_UNIRQ(s) irq_enable_restore(_semaphore_lock_flags) */
 

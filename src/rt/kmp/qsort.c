@@ -1,21 +1,4 @@
-
-/* Copyright (C) 1991-2019 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-   Written by Douglas C. Schmidt (schmidt@ics.uci.edu).
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-/* If you consider tuning this algorithm, you should consult first:
-   Engineering a sort function; Jon Bentley and M. Douglas McIlroy;
-   Software - Practice and Experience; Vol. 23 (11), 1249-1265, 1993.  */
+//qsort from clibrary
 
 #include <nautilus/nautilus.h>
 #include <nautilus/naut_string.h>
@@ -77,13 +60,7 @@ typedef struct
 
 
 void qsort(void *pbase, size_t total_elems, size_t size, int (*cmp)(const void *, const void*)){
-  //empty
 
-  //}
-
-// void _quicksort (void *const pbase, size_t total_elems, size_t size,
-//            __compar_d_fn_t cmp, void *arg)
-//{
   char *base_ptr = (char *) pbase;
   const size_t max_thresh = MAX_THRESH * size;
   if (total_elems == 0)

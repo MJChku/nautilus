@@ -6,40 +6,6 @@
 
 #define calloc(a,b) malloc(a*b)
 
-
-/* struct pmutex{ */
-/*   spinlock_t lock; */
-/*   uint8_t  flags;    */
-/* }; */
-/* struct _thread_with_signal{ */
-/*   nk_thread_t tid; */
-/*   uint8_t signal; */
-/* }; */
-
-/* typedef pte_osMutexHandle struct pmutex* */
-/* typedef pte_osThreadEntryPoint  nk_thread_fun */
-/* typedef pte_osThreadhandle  _thread_with_singal* */
-/* typedef pte_osSemaphoreHandle nk_semaphore* */
-
-/* typedef enum _pthread_signal{ */
-/*   0; */
-/*   NK_THREAD_CANCEL; */
-/* }pthread_signal; */
-
-/* struct timespec */
-/* { */
-/*   time_t  tv_sec; */
-/*   long    tv_nsec; */
-/* }; */
-
-/* struct timeb */
-/* { */
-/*   time_t time; */
-/*   unsigned short millitm; */
-/*   short timezone; */
-/*   short dstflag; */
-/* }; */
-
 #ifndef EPERM
 #define EPERM           1
 #endif // EPERM

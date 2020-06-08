@@ -18,6 +18,8 @@ static inline uint16_t random()
     return t;
 }
 
+extern int getpid();
+
 #define MAXN 5000  /* Max value of N */
 int N;  /* Matrix size */
 int procs;  /* Number of processors to use */
@@ -119,7 +121,7 @@ void  serialgauss(){
 }
 
 void ompgauss() {
-  int norm, row, col;  /* Normalization row, and zeroing
+  int norm, row = 0, col = 0;  /* Normalization row, and zeroing
 			* element row and col */
   float multiplier;
   //doneflag[0] = 1;
@@ -130,8 +132,8 @@ void ompgauss() {
   
   #pragma omp parallel private(col, row,norm, multiplier) num_threads(procs)
   for (norm = 0; norm < N - 1; norm++) {
-  {
-#pragma omp for schedule(static,1)
+  
+  #pragma omp for schedule(static,1)
       for (row = norm + 1; row < N; row++) {
 
         multiplier = A[row][norm] / A[norm][norm];
@@ -143,7 +145,7 @@ void ompgauss() {
         int id = getpid();
 	//printf("tid:%d, B[%d]: %f ", id,row, B[row]);
       }
-  }
+  
   }
   /* (Diagonal elements are not normalized to 1.  This is treated in back
    * substitution.)

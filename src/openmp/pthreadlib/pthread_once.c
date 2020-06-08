@@ -168,7 +168,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
             {
               /* we were last */
               if ((sema =
-                     (pte_osSemaphoreHandle) PTE_ATOMIC_EXCHANGE((int *) &once_control->semaphore,0)))
+                     (pte_osSemaphoreHandle)(intptr_t)PTE_ATOMIC_EXCHANGE((int *)&once_control->semaphore,0)))
                 {
                   pte_osSemaphoreDelete(sema);
                 }

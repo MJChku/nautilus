@@ -209,9 +209,9 @@ pte_osResult pte_osThreadWaitForEnd(pte_osThreadHandle threadHandle){
  */
 pte_osThreadHandle pte_osThreadGetHandle(void){
   //note pte_osThreadHandle is a pointer of struct _thread_with_signal
-  nk_thread_t* thethread = get_cur_thread();
+  void* currthread = (void*)get_cur_thread();
   DEBUG("osThreadGetHandle\n");
-  return (pte_osThreadHandle) pcontainer_of(thethread,struct thread_with_signal, tid);
+  return (pte_osThreadHandle) pcontainer_of(currthread, struct thread_with_signal, tid);
   // return (pte_osThreadHandle)
 }
 
@@ -229,7 +229,6 @@ int pte_osThreadGetPriority(pte_osThreadHandle threadHandle){
  */
 pte_osResult pte_osThreadSetPriority(pte_osThreadHandle threadHandle, int newPriority){
   return PTE_OS_OK;
-
 }
 
 /**
@@ -240,6 +239,7 @@ pte_osResult pte_osThreadSetPriority(pte_osThreadHandle threadHandle, int newPri
 pte_osResult pte_osThreadDelete(pte_osThreadHandle handle){
   DEBUG("osThreadDelete\n");
   nk_thread_destroy(&(handle->tid));
+  return 0;
 }
 
 /**
@@ -252,6 +252,7 @@ pte_osResult pte_osThreadExitAndDelete(pte_osThreadHandle handle){
   //nk_thread_cancel(&(handle->tid));
   DEBUG("osThreadExitDelete\n");
   nk_thread_destroy(&(handle->tid));
+  return 0;
 }
 
 /**
@@ -263,9 +264,10 @@ pte_osResult pte_osThreadExitAndDelete(pte_osThreadHandle handle){
  * @return Thread successfully canceled.
  */
 pte_osResult pte_osThreadCancel(pte_osThreadHandle handle){
-  DEBUG("osThreadCancel \n");
+   DEBUG("osThreadCancel \n");
    handle->signal = NK_THREAD_CANCEL;
    // nk_thread_cancel(&(handle->tid));  
+   return 0;
 }
 
 /**
@@ -449,8 +451,8 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
  * @return PTE_OS_TIMEOUT - Timeout expired before semaphore was obtained.
  */
 pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsigned int *pTimeout){
-     nk_thread_t* thethread= get_cur_thread();
-     pte_osThreadHandle oshandle = pcontainer_of(thethread, struct thread_with_signal, tid);
+     nk_thread_t* thethread = get_cur_thread();
+     pte_osThreadHandle oshandle = pcontainer_of((void*)thethread, struct thread_with_signal, tid);
      DEBUG("osSemaphorecancelablepend\n");
      int res = -1;
    if(pTimeout == NULL){

@@ -1,5 +1,4 @@
-CFLAGS += -fopenmp -Iinclude/rt/openmp \
-	  -w
+CFLAGS += -fopenmp -Iinclude/rt/openmp
 
 obj-y += \
 	sysconf.o\

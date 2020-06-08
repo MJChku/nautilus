@@ -47,10 +47,14 @@
 int
 pthread_attr_getstack (const pthread_attr_t * attr, void **stackaddr, size_t *stacksize)
 {
-   int addr =  pthread_attr_getstackaddr(attr, stackaddr);
-   int size = pthread_attr_getstacksize(attr,stacksize);
+   int addr = pthread_attr_getstackaddr(attr, stackaddr);
+   int size = pthread_attr_getstacksize(attr, stacksize);
+
    if (addr == size == 0){
      return 0;
+   }
+   else {
+     if (addr != 0) return addr; else return size;
    }
 
 }

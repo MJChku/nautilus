@@ -993,7 +993,7 @@ int setenv(const char *name, const char *value, int overwrite){
 
 char *getenv(const char *name)
 {
-  char* target;
+  char* target = NULL;
   struct list_head *cur;
   STATE_LOCK_CONF;
   STATE_LOCK();
@@ -1026,7 +1026,8 @@ char ***nk_environ(void){
   list_for_each(cur, &env_list){
     count++;
   }
-  __environ =  malloc(sizeof(char*)*count);
+
+  __environ = malloc(sizeof(char*)*count);
   int i = 0;
   list_for_each(cur, &env_list){
       __environ[i] = list_entry(cur, struct env_val, list_node)->name;
@@ -1055,9 +1056,9 @@ char ***nk_environ(void){
 /*   return ptr->data; */
 
 /* } */
-char*  UNCONSTCHAR(const char* s) {
+char* UNCONSTCHAR(const char* s) {
     int i; 
-    char* res;
+    char* res = NULL;
     for (i = 0; s[i] != '\0'; i++) { 
         res[i] = s[i]; 
     } 
@@ -1105,7 +1106,7 @@ int getrlimit(int resource, struct rlimit *rlim){
   return 0;
 }
 char* strerror_r(int errnum, char* buf, size_t buflen){
-  memcpy(buf, 'e', sizeof(buflen));
+  memcpy(buf, "e", sizeof(buflen));
   return buf;
 }
 /* void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)){ */

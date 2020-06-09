@@ -7,6 +7,7 @@
 #include <nautilus/thread.h>
 #include <nautilus/spinlock.h>
 #include <nautilus/libccompat.h>
+#include <nautilus/waitqueue.h>
 struct pmutex{
   spinlock_t lock;
   uint8_t  flags;
@@ -15,11 +16,13 @@ struct pmutex{
 struct psemaphore{
   spinlock_t lock;
   int count;
+  nk_wait_queue_t  *wait_queue;
   uint8_t flags;
 };
 struct thread_with_signal{
   nk_thread_id_t tid;
   uint8_t signal;
+  // nk_wait_queue_t *in_queue;
 };
 
 typedef  struct pmutex* pte_osMutexHandle;

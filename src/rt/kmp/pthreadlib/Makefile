@@ -1,5 +1,6 @@
 OMPTEST =\
-	 omptest.o
+	 omptest.o \
+	 pthreadtest.o
 
 MUTEX_OBJS = \
   pthread_mutex_unlock.o \

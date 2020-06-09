@@ -131,7 +131,7 @@ pthread_detach (pthread_t thread)
           /* The thread has exited or is exiting but has not been joined or
            * detached. Need to wait in case it's still exiting.
            */
-          pte_osThreadWaitForEnd(tp->threadId);
+	  pte_osThreadWaitForEnd(tp->threadId);
 
           pte_threadDestroy (thread);
         }

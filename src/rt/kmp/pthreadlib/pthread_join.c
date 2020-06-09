@@ -145,7 +145,9 @@ pthread_join (pthread_t thread, void **value_ptr)
                * pthread_join() or pthread_detach() specifying the same
                * target is undefined.
                */
-              result = pthread_detach (thread);
+
+	      //mjc detached already
+              //result = pthread_detach (thread);
             }
 	  else if (result == PTE_OS_INTERRUPTED)
 	    {

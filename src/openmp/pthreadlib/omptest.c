@@ -52,7 +52,7 @@ void initialize_inputs() {
 
 void reset_inputs(){
   int row, col;
-  printf("\n reseting...\n");
+  printf("\nReseting...\n");
   for (col = 0; col < N; col++) {
     for (row = 0; row < N; row++) {
       A[row][col] = ORA[row][col];
@@ -168,37 +168,38 @@ static int handle_omptest (char * buf, void * priv)
     int seed, size, np;
 
     if ((sscanf(buf,"omptest %d %d %d",&seed,&size,&np)!=3))     { 
-        nk_vc_printf("Don't understand %s please input seed, matrix size and nprocs\n",buf);
+        nk_vc_printf("An error occured while interpreting \'%s\': the format is openmp <seed> <matrix size> <nprocs>\n", buf);
         return -1;
     }
+
     nk_rand_seed(seed);
     N = size;
     procs = np;
     nk_vc_printf("seed %d, size, %d, nprocs: %d\n", seed, N, procs);
     initialize_inputs();
     reset_inputs();
-    uint64_t start = (unsigned int) time(NULL);
+    uint64_t start = nk_sched_get_realtime();
     ompgauss();
-    uint64_t  end = (unsigned int) time(NULL);
-    uint64_t omp = end-start;
-    nk_vc_printf("openmp done\n");
+    uint64_t end = nk_sched_get_realtime();
+    uint64_t omp = end - start;
+    nk_vc_printf("Openmp instance complete with time %d.\n", omp);
     float OMP[N];
-    for(int row =0; row<N; row++){
+    for(int row = 0; row < N; row++){
       OMP[row] = X[row];
     }
 
     reset_inputs();
-    start = (uint64_t) time(NULL);
+    start = nk_sched_get_realtime();
     serialgauss();
-    end = (uint64_t) time(NULL);
-    uint64_t serial = end-start;
-    nk_vc_printf("serial done ");
+    end = nk_sched_get_realtime();
+    uint64_t serial = end - start;
+    nk_vc_printf("Serial instance complete with time %d.\n", serial);
     float difference = 0.0;
-    for(int row =0; row<N; row++){
-      difference += (OMP[row]- X[row]);
+    for(int row = 0; row < N; row++){
+      difference += (OMP[row] - X[row]);
     }
 
-    nk_vc_printf("OMP difference %f!\n", difference);
+    nk_vc_printf("The difference between OMP and serial result is %f.\n", difference);
     return 0;
 
 }

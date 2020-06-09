@@ -5,7 +5,7 @@
 #include <nautilus/thread.h>
 #include <nautilus/scheduler.h>
 #include <nautilus/semaphore.h>
-
+#include <nautilus/waitqueue.h>
 #define ERROR(fmt, args...) ERROR_PRINT("embpthread: " fmt, ##args)
 #define DEBUG(fmt, args...)
 #define INFO(fmt, args...)   INFO_PRINT("embpthread: " fmt, ##args)
@@ -25,6 +25,15 @@
 #define pcontainer_of(ptr, type, member) ({                      \
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
         (type *)( (char *)__mptr - offsetof(type,member) );})
+
+//specific/duplicate of nk function goes here
+static int exit_check(void *state)
+{
+    volatile nk_thread_t *thethread = (nk_thread_t *)state;
+
+    DEBUG("exit_check: thread (%lu %s) status is %u\n",thethread->tid,thethread->name,thethread->status);
+    return thethread->status==NK_THR_EXITED;
+}
 
 /**
  * Provides a hook for the OSAL to implement any OS specific initialization.  This is guaranteed to be
@@ -144,9 +153,9 @@ pte_osResult pte_osThreadCreate(pte_osThreadEntryPoint entryPoint,
   memset(handleobj,0,sizeof(struct thread_with_signal));
 
   //round robin
-  //int cpus =  nk_get_num_cpus();
-  //ERROR("CPUS %d\n", cpus);
-  //cur_cpu = cur_cpu+1 % cpus;
+  /* int cpus =  nk_get_num_cpus(); */
+  /* ERROR("CPUS %d\n", cpus); */
+  /* cur_cpu = cur_cpu+1 % cpus; */
   int ret = nk_thread_create(entryPoint, argv, NULL, false,(nk_stack_size_t) stackSize, &(handleobj->tid),-1);
   if (ret != 0){
     ERROR("create error exit\n");
@@ -155,7 +164,7 @@ pte_osResult pte_osThreadCreate(pte_osThreadEntryPoint entryPoint,
   }
   *handle = handleobj;
   struct nk_thread* thread = (struct nk_thread*) (*handle)->tid;
-  DEBUG("osThreadCreate %08x, %ld\n",  thread, thread->tid);
+  ERROR("osThreadCreate %p, %lu ref %lu\n",  thread, thread->tid, thread->refcount);
  
   return PTE_OS_OK;
 }
@@ -196,13 +205,11 @@ void pte_osThreadExit(){
  */
 pte_osResult pte_osThreadWaitForEnd(pte_osThreadHandle threadHandle){
   DEBUG("pte osThread Wait For End\n");
-  nk_thread_t *thread = (nk_thread_t*) &(threadHandle->tid);
-  while(true){
-    if(thread->status==NK_THR_EXITED){
-      return PTE_OS_OK;
-    }
-    nk_yield();
-  }  
+  nk_thread_t *thethread = (nk_thread_t*) (threadHandle->tid);
+  if(exit_check(thethread)){
+    return 0;
+  }
+  return nk_join(thethread, NULL);
 }
 
 /**
@@ -240,7 +247,7 @@ pte_osResult pte_osThreadSetPriority(pte_osThreadHandle threadHandle, int newPri
  */
 pte_osResult pte_osThreadDelete(pte_osThreadHandle handle){
   DEBUG("osThreadDelete\n");
-  nk_thread_destroy(&(handle->tid));
+  nk_thread_destroy(handle->tid);
 }
 
 /**
@@ -252,7 +259,7 @@ pte_osResult pte_osThreadExitAndDelete(pte_osThreadHandle handle){
   //handle->signal = NK_THREAD_CANCEL;
   //nk_thread_cancel(&(handle->tid));
   DEBUG("osThreadExitDelete\n");
-  nk_thread_destroy(&(handle->tid));
+  nk_thread_destroy(handle->tid);
 }
 
 /**
@@ -278,7 +285,7 @@ pte_osResult pte_osThreadCancel(pte_osThreadHandle handle){
  * @return PTE_OS_INTERRUPTED - Thread has been cancelled.
  */
 pte_osResult pte_osThreadCheckCancel(pte_osThreadHandle handle){
-    nk_thread_t * thethread = (nk_thread_t*)&(handle->tid);
+    nk_thread_t * thethread = (nk_thread_t*) handle->tid;
     DEBUG("osThreadCheckCancel\n");
     if (thethread->status ==NK_THR_EXITED){
       return PTE_OS_OK;
@@ -409,14 +416,11 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
        }
 
      }
-       // nk_yield();
-       //nk_thread_exit(NULL);
-       //nk_yield();
-       //nk_thread_exit(NULL);
+
    }else{
   
     DEBUG("release semaphore\n");
-    unsigned int start = (unsigned int) time(NULL);
+    unsigned int start = (unsigned int) nk_sched_get_realtime();
     unsigned int end = start;
     int res = -1;
     while( (end-start) < *pTimeout ){
@@ -430,7 +434,7 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
 	 nk_yield();
        }
-       end = (unsigned int)time(NULL);
+       end = (unsigned int) nk_sched_get_realtime();
     }
     return PTE_OS_TIMEOUT;
   }
@@ -461,10 +465,12 @@ pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsign
 	 nk_thread_exit(NULL);
          return PTE_OS_INTERRUPTED;
        }
+       DEBUG("osSemaphorecancelablepend aquire lock\n");
        handle->flags = STATE_LOCK(&(handle->lock));
        if(handle->count > 0){
          handle->count--;
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
+         DEBUG("pending done\n");
 	 return PTE_OS_OK;
        }else{
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
@@ -473,7 +479,7 @@ pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsign
      }
    }else{
      DEBUG("release semaphore\n");
-     unsigned int start = (unsigned int) time(NULL);
+     unsigned int start = nk_sched_get_realtime();
      unsigned int end = start;
      while( (end-start) < *pTimeout ){
        if(oshandle->signal == NK_THREAD_CANCEL){
@@ -488,7 +494,7 @@ pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsign
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
 	 nk_yield();
        }
-        end = (unsigned int)time(NULL);
+        end = nk_sched_get_realtime();
      }
      return PTE_OS_TIMEOUT;
    }

@@ -159,7 +159,7 @@ void *cal_zero(void* threadid) {
           pthread_mutex_lock(&lock);
           // for(int k=0;k<)
           //     printf("%d", doneflag);
-              doneflag[norm+1] = 1;
+          doneflag[norm+1] = 1;
           pthread_mutex_unlock(&lock);
         }
     }

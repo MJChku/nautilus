@@ -19,7 +19,7 @@ static inline uint16_t random()
     return t;
 }
 
-#define MAXN 5000  /* Max value of N */
+#define MAXN 5100  /* Max value of N */
 int N;  /* Matrix size */
 int procs;  /* Number of processors to use */
 
@@ -40,12 +40,16 @@ void initialize_inputs() {
   int row, col;
  
   printf("\nInitializing...\n");
-  for (col = 0; col < N; col++) {
+  #pragma omp parallel num_threads(8)
+  {
+    for (col = 0; col < N; col++) {
+#pragma omp for private(row,col) schedule(static,1) nowait
     for (row = 0; row < N; row++) {
       ORA[row][col] = (float) random()/32768.0;
     }
     ORB[col] = (float)random()/32768.0;
     ORX[col] = 0.0;
+  }
   }
 }
 
@@ -132,7 +136,7 @@ void ompgauss() {
   #pragma omp parallel private(col, row,norm, multiplier) num_threads(procs)
   for (norm = 0; norm < N - 1; norm++) {
   {
-#pragma omp for schedule(dynamic)
+       #pragma omp for schedule(static,1)
       for (row = norm + 1; row < N; row++) {
 
         multiplier = A[row][norm] / A[norm][norm];

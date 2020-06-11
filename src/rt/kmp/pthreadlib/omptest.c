@@ -133,23 +133,20 @@ void ompgauss() {
 
   /* Gaussian elimination */
   
-  #pragma omp parallel private(col, row,norm, multiplier) num_threads(procs)
-  for (norm = 0; norm < N - 1; norm++) {
-  {
-       #pragma omp for schedule(static,1)
-      for (row = norm + 1; row < N; row++) {
-
-        multiplier = A[row][norm] / A[norm][norm];
-
-        for (col = norm; col < N; col++) {
-            A[row][col] -= A[norm][col] * multiplier;
-        }
-        B[row] -= B[norm] * multiplier;
-        //int id = getpid();
-	//printf("tid:%d, B[%d]: %f ", id,row, B[row]);
-      }
-  }
-  }
+#pragma omp parallel private(row, col, multiplier, norm) num_threads(procs)
+	{
+		for (norm = 0; norm < N - 1; norm++) {
+                        #pragma omp for schedule(static,1)
+			for (row = norm + 1; row < N; row++) {
+				multiplier = A[row][norm] / A[norm][norm];
+				for (col = norm; col < N; col++) {
+					A[row][col] -= A[norm][col] * multiplier;
+				}
+				B[row] -= B[norm] * multiplier;
+			}
+		}
+	}
+  nk_vc_printf("I am done\n");
   /* (Diagonal elements are not normalized to 1.  This is treated in back
    * substitution.)
    */

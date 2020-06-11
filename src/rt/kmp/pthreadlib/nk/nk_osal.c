@@ -6,27 +6,30 @@
 #include <nautilus/scheduler.h>
 #include <nautilus/semaphore.h>
 #include <nautilus/waitqueue.h>
-#define ERROR(fmt, args...) ERROR_PRINT("embpthread: " fmt, ##args)
-#define DEBUG(fmt, args...)
+#define ERROR(fmt, args...) //ERROR_PRINT("embpthread: " fmt, ##args)
+//#define DEBUG(fmt, args...)
 #define INFO(fmt, args...)   INFO_PRINT("embpthread: " fmt, ##args)
 
 #define DEBUG(fmt, args...)
-#ifdef NAUT_CONFIG_OPENMP_RT_DEBUG
-#undef DEBUG
-#define DEBUG(fmt, args...) DEBUG_PRINT("empthread: " fmt, ##args)
-#endif
+//#ifdef NAUT_CONFIG_OPENMP_RT_DEBUG
+//#undef DEBUG_PRINT
+//#define DEBUG(fmt, args...) DEBUG_PRINT("empthread: " fmt, ##args)
+//#endif
 
 #define STATE_UNLOCK(a,b) spin_unlock_irq_restore(a,b)
 #define STATE_TRY_LOCK(a,b) spin_try_lock_irq_save(a,b)
 #define STATE_LOCK(a) spin_lock_irq_save(a)
 #define RESTORE_UNIRQ(a,b) irq_enable_restore(b)
 
+#define ZOMBIE 200
 
 #define poffsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #define pcontainer_of(ptr, type, member) ({                      \
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
         (type *)( (char *)__mptr - offsetof(type,member) );})
 
+#define  TIME() (unsigned int)nk_sched_get_realtime();
+#define  NS 1000000ULL
 //specific/duplicate of nk function goes here
 static int exit_check(void *state)
 {
@@ -99,13 +102,13 @@ pte_osResult pte_osMutexLock(pte_osMutexHandle handle){
  * @return PTE_OS_TIMEOUT - Timeout expired before lock was obtained.
  */
 pte_osResult pte_osMutexTimedLock(pte_osMutexHandle handle, unsigned int timeout){
-  unsigned int start = (unsigned int) time(NULL);
+  unsigned int start = TIME();
   unsigned int end = start;
   int res = -1;
-  while( (end-start) <timeout ){
+  while( (end-start) <timeout*NS ){
     res=STATE_TRY_LOCK(&(handle->lock), &(handle->flags) );
     DEBUG("osMutexTimedLock\n");
-    end = (unsigned int)time(NULL);
+    end = TIME();
     if(res == 0){
       return PTE_OS_OK;
     }
@@ -206,6 +209,8 @@ void pte_osThreadExit(){
 pte_osResult pte_osThreadWaitForEnd(pte_osThreadHandle threadHandle){
   DEBUG("pte osThread Wait For End\n");
   nk_thread_t *thethread = (nk_thread_t*) (threadHandle->tid);
+  //nk_wait_queue_sleep_extended(thethread->waitq, exit_check, thethread);
+  //return PTE_OS_OK;
   /* if(thethread->refcount <= 1){ */
   /*   return 0; */
   /* } */
@@ -278,7 +283,6 @@ pte_osResult pte_osThreadExitAndDelete(pte_osThreadHandle handle){
 pte_osResult pte_osThreadCancel(pte_osThreadHandle handle){
    ERROR("******************osThreadCancel \n");
    handle->signal = NK_THREAD_CANCEL;
-
    // if thread is waiting in queue, wake up
    /* if(handle->in_queue){ */
    /*   nk_wait_queue_wake_all(handle->in_queue); */
@@ -298,7 +302,7 @@ pte_osResult pte_osThreadCancel(pte_osThreadHandle handle){
  */
 pte_osResult pte_osThreadCheckCancel(pte_osThreadHandle handle){
     nk_thread_t * thethread = (nk_thread_t*) handle->tid;
-    DEBUG("osThreadCheckCancel\n");
+    ERROR("osThreadCheckCancel\n");
     if (thethread->status ==NK_THR_EXITED){
       return PTE_OS_INTERRUPTED;
     }else{
@@ -311,13 +315,15 @@ pte_osResult pte_osThreadCheckCancel(pte_osThreadHandle handle){
  */
 void pte_osThreadSleep(unsigned int msecs){
   //DEBUG("os thread start to sleep\n");
+  nk_sleep(msecs*1000000ULL);
+  return;
   //nk_thread_exit(NULL);
-  unsigned int start = (unsigned int) time(NULL);
+  unsigned int start = (unsigned int)nk_sched_get_realtime();
   unsigned int end = start;
   int res = -1;
-  while( (end-start) <msecs ){
+  while( (end-start) <msecs*NS ){
     nk_yield();
-    end = (unsigned int)time(NULL);
+    end = (unsigned int)nk_sched_get_realtime();
     //DEBUG("os Thread Sleep end %d time %d \n", end-start, msecs);
   }
 }
@@ -362,6 +368,7 @@ int pte_osThreadGetDefaultPriority(){
  */
 pte_osResult pte_osSemaphoreCreate(int initialValue, pte_osSemaphoreHandle *pHandle){
   //pte_osSemaphoreHandle is nk_semaphore
+   DEBUG("osSemaphoreCreate\n");
    *pHandle = malloc(sizeof(struct psemaphore));
 
    memset(*pHandle,0,sizeof(struct psemaphore));
@@ -375,7 +382,7 @@ pte_osResult pte_osSemaphoreCreate(int initialValue, pte_osSemaphoreHandle *pHan
         return  PTE_OS_NO_RESOURCES;
     }
   //*pHandle->sem = nk_semaphore_create(NULL,initialValue,0,NULL);   
-  DEBUG("osSemaphoreCreate\n");
+  DEBUG("done\n");
   return PTE_OS_OK;
 }
 
@@ -403,13 +410,20 @@ pte_osResult pte_osSemaphoreDelete(pte_osSemaphoreHandle handle){
  * @return PTE_OS_OK - semaphore successfully released.
  */
 pte_osResult pte_osSemaphorePost(pte_osSemaphoreHandle handle, int count){
-    DEBUG("releaseosSemaphorePost\n");
+    ERROR("releaseosSemaphorePost\n");
     handle->flags = STATE_LOCK(&(handle->lock));
     handle->count += count;
-    //int a = count;
-    /* while(a--){ */
-    /*   nk_wait_queue_wake_one(handle->wait_queue); */
-    /* } */
+    // int old = pte_osAtomicAdd(&(handle->count), count);
+    //if(old<0){
+    int a = count;
+    if(a > handle->sleepcount){
+      a = handle->sleepcount;
+    }
+    handle->sleepcount -= a;
+    while(a--){
+       nk_wait_queue_wake_one(handle->wait_queue);
+    }
+      // }
     STATE_UNLOCK(&(handle->lock), handle->flags);
     return PTE_OS_OK;
 }
@@ -426,48 +440,56 @@ pte_osResult pte_osSemaphorePost(pte_osSemaphoreHandle handle, int count){
  * @return PTE_OS_TIMEOUT - Timeout expired before semaphore was obtained.
  */
 pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTimeout){
-   ERROR("osSemaphorePend\n");
+
+   //return pte_osSemaphoreCancellablePend(handle, pTimeout);
+  int busy_wait = 0;
+   DEBUG("osSemaphorePend\n");
    if(pTimeout == NULL){
-     /* while(1){ */
-     /*   DEBUG("osSemaphorePend NULL time\n"); */
-     /*   handle->flags = STATE_LOCK(&(handle->lock)); */
-     /*   if(handle->count > 0){ */
-     /*     handle->count--; */
-     /* 	 STATE_UNLOCK(&(handle->lock), handle->flags); */
-     /* 	 return PTE_OS_OK; */
-     /*   }else{ */
-     /* 	 STATE_UNLOCK(&(handle->lock), handle->flags); */
-     /* 	 nk_yield(); */
-     /*   } */
-
-     /* } */
      while(1){
-        DEBUG("osSemaphorePend\n");
+       DEBUG("osSemaphoreBusyWaitPend\n");
        handle->flags = STATE_LOCK(&(handle->lock));
-
        if(handle->count > 0){
-         handle->count--;
+	 handle->count--;
+         //pte_osAtomicDecrement(&(handle->count));;
      	 STATE_UNLOCK(&(handle->lock), handle->flags);
      	 return PTE_OS_OK;
        }else{
-	 
-	// STATE_UNLOCK(&(handle->lock), handle->flags);	
+     	 STATE_UNLOCK(&(handle->lock), handle->flags);
+	 busy_wait++;
+	 if(busy_wait > ZOMBIE){
+           busy_wait=0;
+	   break;
+	 }
+	 nk_yield();
+       }
+     }
+     
+     while(1){
+       ERROR("osSemaphoreSleepPend\n");
+       handle->flags = STATE_LOCK(&(handle->lock));
+       if(handle->count > 0){
+	 handle->count--;
+	 //int ori =  pte_osAtomicDecrement(&(handle->count));
+     	 STATE_UNLOCK(&(handle->lock), handle->flags);
+     	 return PTE_OS_OK;
+       }else{	 
+       // STATE_UNLOCK(&(handle->lock), handle->flags);
        // we need to gracefully put ourselves to sleep
         nk_thread_t *t = get_cur_thread();
         // disable preemption early since interrupts may remain on given our locking model
         //preempt_disable();
-
-        // onto the semaphore's wait queue we go
-        t->status = NK_THR_WAITING;
+        preempt_disable();
+	t->status = NK_THR_WAITING;
         nk_wait_queue_enqueue(handle->wait_queue,t);
-        STATE_UNLOCK(&(handle->lock), handle->flags);	
+        handle->sleepcount++;
+	//pte_osAtomicIncrement(&(handle->sleepcount));
+        //STATE_UNLOCK(&(handle->lock), handle->flags);
         // and go to sleep - this will also release the lock
         // and reenable preemption
-        nk_sched_sleep(NULL);
-        // We are now back, which means we must be good to go
-        // except for interrupts
-	// SEMAPHORE_UNIRQ(s);
-        DEBUG("down end  waited\n");
+        nk_sched_sleep(&(handle->lock));
+	ERROR("*********wake up******\n");
+	irq_enable_restore(handle->flags);
+	//return PTE_OS_OK;
        }
      }
    }else{
@@ -476,11 +498,12 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
     unsigned int start = (unsigned int) nk_sched_get_realtime();
     unsigned int end = start;
     int res = -1;
-    while( (end-start) < *pTimeout ){
+    while( (end-start) < (*pTimeout)*NS ){
       DEBUG("osSemaphorePend %d \n", end-start);
       handle->flags = STATE_LOCK(&(handle->lock));
       if(handle->count > 0){
-         handle->count--;
+	handle->count--;
+	//pte_osAtomicDecrement(&(handle->count));
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
 	 return PTE_OS_OK;
        }else{
@@ -507,6 +530,10 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
  * @return PTE_OS_TIMEOUT - Timeout expired before semaphore was obtained.
  */
 pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsigned int *pTimeout){
+
+     //cancel not allowed !!!
+     return pte_osSemaphorePend(handle, pTimeout);
+
      nk_thread_t* thethread= get_cur_thread();
      pte_osThreadHandle oshandle = pcontainer_of(thethread, struct thread_with_signal, tid);
      DEBUG("osSemaphorecancelablepend\n");
@@ -518,36 +545,54 @@ pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle handle, unsign
 	 nk_thread_exit(NULL);
          return PTE_OS_INTERRUPTED;
        }
-       DEBUG("osSemaphorecancelablepend aquire lock\n");
+       // DEBUG("osSemaphorecancelablepend aquire lock\n");
        handle->flags = STATE_LOCK(&(handle->lock));
-       if(handle->count > 0){
-         handle->count--;
+       int ori =  pte_osAtomicDecrement(&(handle->count));
+       if(ori > 0){
+         //handle->count--;
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
          DEBUG("pending done\n");
 	 return PTE_OS_OK;
        }else{
-	 STATE_UNLOCK(&(handle->lock), handle->flags);
-	 nk_yield();
+	 
+	 //	 STATE_UNLOCK(&(handle->lock), handle->flags);
+	 //nk_yield();
+	 nk_thread_t *t = get_cur_thread();
+        // disable preemption early since interrupts may remain on given our locking model
+        //preempt_disable();
+
+        // onto the semaphore's wait queue we go
+	ERROR("=====semaphore sleep\n");
+        preempt_disable();
+	t->status = NK_THR_WAITING;
+        nk_wait_queue_enqueue(handle->wait_queue,t);
+        //STATE_UNLOCK(&(handle->lock), handle->flags);
+        // and go to sleep - this will also release the lock
+        // and reenable preemption
+        nk_sched_sleep(&(handle->lock));
+	ERROR("*********wake up******\n");
+	irq_enable_restore(handle->flags);
+	return PTE_OS_OK;
        }
      }
    }else{
      DEBUG("release semaphore\n");
-     unsigned int start = nk_sched_get_realtime();
+     unsigned int start = TIME();
      unsigned int end = start;
-     while( (end-start) < *pTimeout ){
+     while( (end-start) < (*pTimeout)*NS ){
        if(oshandle->signal == NK_THREAD_CANCEL){
          return PTE_OS_INTERRUPTED;
        }
        handle->flags = STATE_LOCK(&(handle->lock));
        if(handle->count > 0){
-         handle->count--;
+         pte_osAtomicDecrement(&(handle->count));
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
 	 return PTE_OS_OK;
        }else{
 	 STATE_UNLOCK(&(handle->lock), handle->flags);
 	 nk_yield();
        }
-        end = nk_sched_get_realtime();
+       end = TIME();
      }
      return PTE_OS_TIMEOUT;
    }

@@ -14,6 +14,7 @@ struct pmutex{
 };
 
 struct psemaphore{
+  int sleepcount;
   spinlock_t lock;
   int count;
   nk_wait_queue_t  *wait_queue;

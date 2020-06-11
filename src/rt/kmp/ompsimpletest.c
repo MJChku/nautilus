@@ -19,7 +19,7 @@ static int handle_gputest (char * buf, void * priv)
       
       /* long id = getpid(); */
       /* nk_vc_printf("****omptest==thread id %d", id);	 */
-       #pragma omp for schedule(static, 1) 
+       #pragma omp for private(i) schedule(static, 1)
         for( i=0;i<8;i++){
 	 long id = getpid();
          nk_vc_printf("****omptest==thread id %d\n", id);  
@@ -27,7 +27,7 @@ static int handle_gputest (char * buf, void * priv)
       }
 
     }
-
+  return 0;
 }
 
 

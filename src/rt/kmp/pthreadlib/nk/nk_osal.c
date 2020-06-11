@@ -22,7 +22,7 @@
 #define RESTORE_UNIRQ(a,b) irq_enable_restore(b)
 
 #define ZOMBIE 200
-
+#define ZOMBIE_mode true
 #define poffsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #define pcontainer_of(ptr, type, member) ({                      \
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
@@ -30,6 +30,7 @@
 
 #define  TIME() (unsigned int)nk_sched_get_realtime();
 #define  NS 1000000ULL
+
 //specific/duplicate of nk function goes here
 static int exit_check(void *state)
 {
@@ -458,7 +459,8 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
 	 busy_wait++;
 	 if(busy_wait > ZOMBIE){
            busy_wait=0;
-	   break;
+	   if(ZOMBIE_mode)
+	      break;
 	 }
 	 nk_yield();
        }

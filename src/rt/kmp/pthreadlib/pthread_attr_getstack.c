@@ -53,4 +53,5 @@ pthread_attr_getstack (const pthread_attr_t * attr, void **stackaddr, size_t *st
      return 0;
    }
 
+   return 0;
 }

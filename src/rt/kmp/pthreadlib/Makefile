@@ -1,6 +1,9 @@
-OMPTEST =\
-	 omptest.o \
-	 pthreadtest.o
+CFLAGS += -w
+NK_LIB =\
+	nk/
+
+PTHREAD_TEST =\
+	 pthreadtest/
 
 MUTEX_OBJS = \
   pthread_mutex_unlock.o \
@@ -155,7 +158,7 @@ CANCEL_OBJS = \
 
 OBJS = $(MUTEX_OBJS) $(MUTEXATTR_OBJS) $(THREAD_OBJS) $(SUPPORT_OBJS) $(TLS_OBJS) $(MISC_OBJS) $(SEM_OBJS) $(BARRIER_OBJS) $(SPIN_OBJS) $(CONDVAR_OBJS) $(RWLOCK_OBJS) $(CANCEL_OBJS)
 obj-y +=$(OBJS) \
-	nk/ \
-	$(OMPTEST)
+	$(NK_LIB) \
+	$(PTHREAD_TEST)
 
 

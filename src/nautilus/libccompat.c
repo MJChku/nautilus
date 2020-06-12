@@ -921,11 +921,6 @@ GEN_DEF(__divsc3)
 #define DEBUG(fmt, args...) DEBUG_PRINT("kmp: " fmt, ##args)
 #endif
 
-static spinlock_t env_list_lock;
-#define STATE_LOCK_CONF uint8_t _state_lock_flags
-#define STATE_LOCK() _state_lock_flags = spin_lock_irq_save(&env_list_lock)
-#define STATE_UNLOCK() spin_unlock_irq_restore(&env_list_lock, _state_lock_flags)
-
 unsigned long getpid(void){
   nk_thread_t * t = (nk_thread_t*)get_cur_thread();
   DEBUG("threadid %d\n", t->tid);
@@ -943,144 +938,50 @@ struct timeval gettimeofday(void){
   return timeofday;
 }
 
-#define MAX_ENV 50
+
 #define KMP_ENV "KMP"
-
-typedef struct env_val{
-  char name[MAX_ENV];
-  char value[MAX_ENV];
-  struct list_head list_node;
-} env_val;
-
-static struct list_head env_list;
-static int init_env = 0;
-
-void insert_env_list(char* name, char*value){
-   env_val *new_env;
-   new_env = malloc(sizeof(*new_env));
-   memset(new_env, 0, sizeof(*new_env));
-   strncpy(new_env->name, name,MAX_ENV);
-   strncpy(new_env->value,value,MAX_ENV);
-   INIT_LIST_HEAD(&new_env->list_node);
-   STATE_LOCK_CONF;
-   STATE_LOCK();
-   list_add_tail(&new_env->list_node, &env_list);
-   DEBUG("set  %s, %s\n",name,value);
-   STATE_UNLOCK();
-}
-
 
 int setenv(const char *name, const char *value, int overwrite){
   struct nk_env * kmpenv = nk_env_find(KMP_ENV);
-  nk_env_insert(kmpenv, name,value);
+  char *key = (char*)name;
+  char *keyvalue = (char*)value;
+  nk_env_insert(kmpenv, key, keyvalue);
   return 0;
-  
-  /* if(init_env == 0){ */
-  /*   INIT_LIST_HEAD(&env_list); */
-  /*   insert_env_list("LANG", "en_HK.UTF-8"); */
-  /*   init_env = 1; */
-  /* } */
-  /* env_val *new_env; */
-  /* new_env = malloc(sizeof(*new_env)); */
-  /* memset(new_env, 0, sizeof(*new_env)); */
-  /* strncpy(new_env->name, name,MAX_ENV); */
-  /* strncpy(new_env->value,value,MAX_ENV); */
-  /* //new_env->value = value; */
-  /* INIT_LIST_HEAD(&new_env->list_node); */
-  /* STATE_LOCK_CONF; */
-  /* STATE_LOCK(); */
-  /* list_add_tail(&new_env->list_node, &env_list); */
-  /* DEBUG("set  %s, %s\n",name,value); */
-  /* STATE_UNLOCK(); */
-  /* /\* if(overwrite){ *\/ */
-
-  /* /\* } *\/ */
-  /* return 0; */
-
 }
 
 
 char *getenv(const char *name)
 {
+  char *key =(char*) name;
   struct nk_env *kmpenv = nk_env_find(KMP_ENV);
   char *value =NULL;
-  nk_env_search(kmpenv, name,&value);
+  nk_env_search(kmpenv,key,&value);
   return value;
-  /* char* target; */
-  /* struct list_head *cur; */
-  /* STATE_LOCK_CONF; */
-  /* STATE_LOCK(); */
-  /* list_for_each(cur, &env_list){ */
-  /*   //name equals */
-  /*   //DEBUG("list %s\n", list_entry(cur, struct env_val,list_node)->value); */
-  /*   if(!strcmp(list_entry(cur, struct env_val,list_node)->name,name)){ */
-  /*     target = list_entry(cur, struct env_val, list_node)->value; */
-  /*     break; */
-  /*   } */
-  /* } */
-
-  /* STATE_UNLOCK(); */
-  /* DEBUG("get %s, %s\n",name,target ); */
-  /* return target; */
-
-  /*   DEBUG("getenv %s\n", name); */
-  /*   // UNDEF_FUN_ERR(); */
+  // UNDEF_FUN_ERR(); */
 }
 
 
 //#define environ  (*_environ())
 
 char **nk_environ(void){
-  char* a[2];
-  a[0] = malloc(sizeof(char)*256);
-  memset(a[0], 0, sizeof(char)*256);
-  strcpy(a[0], "KMP_AFFINITY=verbose,granularity=core");
-  a[1] = malloc(sizeof(char)*256);
-  memset(a[1], 0, sizeof(char)*256);
-  strcpy(a[1], "OMP_NUM_THREADS=1");
-  return a;
+  return NULL;
+  /* char* a[2]; */
+  /* return a; */
+  /* a[0] = malloc(sizeof(char)*256); */
+  /* memset(a[0], 0, sizeof(char)*256); */
+  /* strcpy(a[0], "KMP_AFFINITY=verbose,granularity=core"); */
+  /* a[1] = malloc(sizeof(char)*256); */
+  /* memset(a[1], 0, sizeof(char)*256); */
+  /* strcpy(a[1], "OMP_NUM_THREADS=1"); */
+  /* return a; */
   //return nk_get_environ(nk_env_find(KMP_ENV));
-  /* char** __environ; */
-  /* int count=0; */
-  /* struct list_head *cur; */
-  /* STATE_LOCK_CONF; */
-  /* STATE_LOCK(); */
-  /* list_for_each(cur, &env_list){ */
-  /*   count++; */
-  /* } */
-  /* __environ =  malloc(sizeof(char*)*count); */
-  /* int i = 0; */
-  /* list_for_each(cur, &env_list){ */
-  /*     __environ[i] = list_entry(cur, struct env_val, list_node)->name; */
-  /*     i++; */
-  /* } */
 
-  /* STATE_UNLOCK(); */
-  /* return &__environ; */
 }
 
-/* static char** environ; */ 
-
-/* int setenv(const char *name, const char *value, int overwrite){ */
-
-/*     struct nk_env *ptr; */
-/*     nk_env_insert(ptr ,name,value); */
-/*     DEBUG("set  %s, %s\n",name,value); */
-/*     return 0; */
-/* } */
-
-
-
-/* char *getenv(const char *name){ */
-/*   struct nk_env * ptr = nk_env_find(name); */
-/*   DEBUG("get %s, %s\n",name, ptr->data ); */
-/*   return ptr->data; */
-
-/* } */
 
 char*  UNCONSTCHAR(const char* s) {
     int i; 
-    char* res;
+    char* res = NULL;
     for (i = 0; s[i] != '\0'; i++) { 
         res[i] = s[i]; 
     } 
@@ -1103,11 +1004,6 @@ vfprintf (FILE * stream, const char * format, va_list arg)
     // return -1;
 }
 
-/* int sched_yield(void){ */
-  
-/*   nk_yield(); */
-/*   return 0; */
-/* } */
 
 long sysconf(int name){
   //DEBUG("sysconf, %d",name);
@@ -1123,22 +1019,17 @@ struct rlimit {
 
 int getrlimit(int resource, struct rlimit *rlim){
   DEBUG("getrlimit %d\n", resource); 
-  rlim->rlim_cur = 0xF000;
-  rlim->rlim_max = 0xF000;
+  rlim->rlim_cur = 0xF0000000;
+  rlim->rlim_max = 0xF0000000;
   return 0;
 }
 char* strerror_r(int errnum, char* buf, size_t buflen){
-  memcpy(buf, 'e', sizeof(buflen));
+  //memcpy(buf, '0', sizeof(buflen));
   return buf;
 }
-/* void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)){ */
-/*   //empty */
-
-/* } */
 
 
 // Other stuff KMP needs, for a start
-
 int atomic_load_explicit(void *ptr ,int mmodel){
   DEBUG("calls into atomic_load_explicit\n");
   return 1;//__sync_fetch_and_or(ptr,0);

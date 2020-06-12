@@ -1,5 +1,4 @@
 /* pte_types.h  */
-
 #ifndef PTE_TYPES_H
 #define PTE_TYPES_H
 #include <nautilus/list.h>
@@ -8,6 +7,7 @@
 #include <nautilus/spinlock.h>
 #include <nautilus/libccompat.h>
 #include <nautilus/waitqueue.h>
+
 struct pmutex{
   spinlock_t lock;
   uint8_t  flags;
@@ -40,11 +40,6 @@ typedef enum _pthread_signal{
 typedef nk_thread_fun_t pte_osThreadEntryPoint;
 typedef int pid_t;
 typedef unsigned int mode_t;
-/* struct timespec */
-/* { */
-/*   time_t  tv_sec; */
-/*   long    tv_nsec; */
-/* }; */
 
 struct timeb
 {

@@ -208,7 +208,7 @@ pthread_create (pthread_t * tid,
     }
 
   //mjc change pte_threadstart to function pointer
-  osResult = pte_osThreadCreate(&pte_threadStart,
+  osResult = pte_osThreadCreate((void *)&pte_threadStart,
                                 stackSize,
                                 priority,
                                 parms,

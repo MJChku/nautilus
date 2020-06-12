@@ -3,8 +3,8 @@
 #include <nautilus/libccompat.h>
 #include <nautilus/random.h>
 #include <nautilus/scheduler.h>
-#include "pthread.h"
-#include "semaphore.h"
+#include "../pthread.h"
+#include "../semaphore.h"
 #ifndef NAUT_CONFIG_DEBUG_GPUDEV
 #undef DEBUG_PRINT
 #define DEBUG_PRINT(fmt, args...) 

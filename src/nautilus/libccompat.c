@@ -964,9 +964,10 @@ char *getenv(const char *name)
 //#define environ  (*_environ())
 
 char **nk_environ(void){
-  return NULL;
-  /* char* a[2]; */
-  /* return a; */
+  //return NULL;
+   char** a = malloc(sizeof(char*));
+   memset(a,0, sizeof(char*));
+   return a; 
   /* a[0] = malloc(sizeof(char)*256); */
   /* memset(a[0], 0, sizeof(char)*256); */
   /* strcpy(a[0], "KMP_AFFINITY=verbose,granularity=core"); */
@@ -992,16 +993,10 @@ char*  UNCONSTCHAR(const char* s) {
 int 
 vfprintf (FILE * stream, const char * format, va_list arg)
 {
-    //char *fmt;
-    //malloc()
-      //fmformat
-   DEBUG("====");
    #ifdef NAUT_CONFIG_OPENMP_RT_DEBUG
-   nk_vc_printf(format,arg);
+   nk_vc_printf((char*)format,arg);
    #endif
-   //nk_vc_printf(format,);
     return 0;
-    // return -1;
 }
 
 

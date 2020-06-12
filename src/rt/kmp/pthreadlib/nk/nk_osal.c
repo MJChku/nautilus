@@ -8,12 +8,11 @@
 #include <nautilus/waitqueue.h>
 
 #define ERROR(fmt, args...) //ERROR_PRINT("embpthread: " fmt, ##args)
-#define DEBUG(fmt, args...)
 #define INFO(fmt, args...)   INFO_PRINT("embpthread: " fmt, ##args)
 
 #define DEBUG(fmt, args...)
 #ifdef NAUT_CONFIG_OPENMP_RT_DEBUG
-#undef DEBUG_PRINT
+#undef DEBUG
 #define DEBUG(fmt, args...) DEBUG_PRINT("empthread: " fmt, ##args)
 #endif
 
@@ -193,9 +192,8 @@ pte_osResult pte_osThreadWaitForEnd(pte_osThreadHandle threadHandle){
  *=================================================================*/
 pte_osThreadHandle pte_osThreadGetHandle(void){
   //note pte_osThreadHandle is a pointer of struct _thread_with_signal
-  //nk_thread_t* thethread = get_cur_thread();
+  nk_thread_t* thethread = get_cur_thread();
   DEBUG("osThreadGetHandle\n");
-  void* thethread = (void*) get_cur_thread();
   return (pte_osThreadHandle) pcontainer_of(thethread,struct thread_with_signal, tid);
 }
 

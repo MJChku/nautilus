@@ -40,15 +40,15 @@ void initialize_inputs() {
   int row, col;
  
   printf("\nInitializing...\n");
-  #pragma omp parallel num_threads(8)
+  //   #pragma omp parallel num_threads(8)
   {
+  //  #pragma omp for private(row,col) schedule(static,1) nowait
     for (col = 0; col < N; col++) {
-#pragma omp for private(row,col) schedule(static,1) nowait
+   
     for (row = 0; row < N; row++) {
-      ORA[row][col] = (float) random()/32768.0;
+      ORA[col][row] = (float) random()/32768.0;
     }
     ORB[col] = (float)random()/32768.0;
-    ORX[col] = 0.0;
   }
   }
 }
@@ -70,7 +70,7 @@ void reset_inputs(){
 void print_inputs() {
   int row, col;
 
-  if (N < 100) {
+  if (N < 1000) {
     printf("\nA =\n\t");
     for (row = 0; row < N; row++) {
       for (col = 0; col < N; col++) {
@@ -97,7 +97,11 @@ void  serialgauss(){
     
     // int num = N - norm;
     
-  {
+
+    {
+
+      //printf("%f ", A[norm][norm]);
+
       for (row = norm + 1; row < N; row++) {
 
         multiplier = A[row][norm] / A[norm][norm];
@@ -119,6 +123,7 @@ void  serialgauss(){
       X[row] -= A[row][col] * X[col];
     }
     X[row] /= A[row][row];
+    //printf("%5.2f ", X[row]);
   }
 
 }
@@ -138,7 +143,8 @@ void ompgauss() {
 		for (norm = 0; norm < N - 1; norm++) {
                        #pragma omp for schedule(static,1)
 			for (row = norm + 1; row < N; row++) {
-				multiplier = A[row][norm] / A[norm][norm];
+			  
+			  multiplier = A[row][norm]/A[norm][norm];
 				for (col = norm; col < N; col++) {
 					A[row][col] -= A[norm][col] * multiplier;
 				}
@@ -161,10 +167,10 @@ void ompgauss() {
 }
 
 
-#define TIME() (double)nk_sched_get_realtime()/1e9;
+#define TIME() (double)nk_sched_get_realtime();
 static int handle_omptest (char * buf, void * priv)
 {
-
+    
     int seed, size, np;
 
     if ((sscanf(buf,"omptest %d %d %d",&seed,&size,&np)!=3))     { 
@@ -175,8 +181,20 @@ static int handle_omptest (char * buf, void * priv)
     N = size;
     procs = np;
     nk_vc_printf("seed %d, size, %d, nprocs: %d\n", seed, N, procs);
+    
     initialize_inputs();
     reset_inputs();
+    // print_inputs();
+
+    unsigned mxcsr;
+    __asm__ volatile("ldmxcsr %0"::"m"(*&mxcsr):"memory");
+    printf("ld %04x \n", mxcsr);
+    mxcsr = mxcsr ^ 0x0200;
+    printf("st %08x \n", mxcsr);
+    __asm__ volatile("stmxcsr %0"::"m"(*&mxcsr):"memory");
+     __asm__ volatile("ldmxcsr %0"::"m"(*&mxcsr):"memory");
+    printf("ld %08x \n", mxcsr);
+ 
     double start = TIME();
     ompgauss();
     double  end = TIME();

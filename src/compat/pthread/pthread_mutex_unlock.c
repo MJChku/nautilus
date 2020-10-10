@@ -78,26 +78,28 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
           int idx;
 
           idx = PTE_ATOMIC_EXCHANGE (&mx->lock_idx,0);
-          if (idx != 0)
-            {
-              if (idx < 0)
-                {
-                  /*
-                   * Someone may be waiting on that mutex.
-                   */
-                  if (pte_osSemaphorePost(mx->handle,1) != PTE_OS_OK)
-                    {
-                      result = EINVAL;
-                    }
-                }
-            }
-          else
-            {
-              /*
-               * Was not locked (so can't be owned by us).
-               */
-              result = EPERM;
-            }
+	  if ( idx == 0 )
+	     result = EPERM;
+          /* if (idx != 0) */
+          /*   { */
+          /*     if (idx < 0) */
+          /*       { */
+          /*         /\* */
+          /*          * Someone may be waiting on that mutex. */
+          /*          *\/ */
+          /*         if (pte_osSemaphorePost(mx->handle,1) != PTE_OS_OK) */
+          /*           { */
+          /*             result = EINVAL; */
+          /*           } */
+          /*       } */
+          /*   } */
+          /* else */
+          /*   { */
+          /*     /\* */
+          /*      * Was not locked (so can't be owned by us). */
+          /*      *\/ */
+          /*     result = EPERM; */
+          /*   } */
         }
       else
         {
@@ -110,10 +112,10 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 
                   if (PTE_ATOMIC_EXCHANGE (&mx->lock_idx,0) < 0)
                     {
-                      if (pte_osSemaphorePost(mx->handle,1) != PTE_OS_OK)
-                        {
-                          result = EINVAL;
-                        }
+                      /* if (pte_osSemaphorePost(mx->handle,1) != PTE_OS_OK) */
+                      /*   { */
+                      /*     result = EINVAL; */
+                      /*   } */
 
                     }
                 }

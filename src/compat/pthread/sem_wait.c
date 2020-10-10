@@ -148,7 +148,10 @@ sem_wait (sem_t * sem)
             {
               /* Must wait */
               pthread_cleanup_push(pte_sem_wait_cleanup, (void *) s);
-              result = pte_cancellable_wait(s->sem,NULL);
+
+              //mjc no cancel
+	      result =  pte_osSemaphorePend(s->sem, NULL);
+	      //result = pte_cancellable_wait(s->sem,NULL);
               /* Cleanup if we're canceled or on any other error */
               pthread_cleanup_pop(result);
 

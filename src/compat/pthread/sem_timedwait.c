@@ -194,7 +194,9 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
                 /* Must wait */
                 pthread_cleanup_push(pte_sem_timedwait_cleanup, (void *) &cleanup_args);
 
-                result = pte_cancellable_wait(s->sem,pTimeout);
+		//mjc no cancel
+                result = pte_osSemaphorePend(s->sem, pTimeout);
+		//result = pte_cancellable_wait(s->sem,pTimeout);
 
                 pthread_cleanup_pop(result);
               }

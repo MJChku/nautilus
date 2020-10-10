@@ -86,13 +86,14 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
             1) != 0)
         {
           while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
-            {
-              if (pte_osSemaphorePend(mx->handle,NULL) != PTE_OS_OK)
-                {
-                  result = EINVAL;
-                  break;
-                }
-            }
+	                nk_yield();
+            /* { */
+            /*   if (pte_osSemaphorePend(mx->handle,NULL) != PTE_OS_OK) */
+            /*     { */
+            /*       result = EINVAL; */
+            /*       break; */
+            /*     } */
+            /* } */
         }
     }
   else
@@ -120,13 +121,14 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
           else
             {
               while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
-                {
-                  if (pte_osSemaphorePend(mx->handle,NULL) != PTE_OS_OK)
-                    {
-                      result = EINVAL;
-                      break;
-                    }
-                }
+			nk_yield();
+		/* { */
+                /*   if (pte_osSemaphorePend(mx->handle,NULL) != PTE_OS_OK) */
+                /*     { */
+                /*       result = EINVAL; */
+                /*       break; */
+                /*     } */
+                /* } */
 
               if (0 == result)
                 {

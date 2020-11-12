@@ -477,14 +477,14 @@ static int pte_test_main()
       printf("   Test iteration #%d\n\n",i);
       printf("=========================\n");
 
-      runThreadTests(); 
+      //runThreadTests(); 
       //runMiscTests();
       //runMutexTests();
       //runSemTests();
       //runCondvarTests();
       //runBarrierTests();
-      //runSpinTests();
-      //runRwlockTests();
+      runSpinTests();
+      runRwlockTests();
       //runCancelTests();
       //runExceptionTests();
       //runBenchTests();

@@ -14,9 +14,15 @@ struct ticketmutex{
  union  nk_ticket_lock lock;
 }; //not used 
 
-struct pmutex{
-  spinlock_t lock;
-  uint8_t  flags;
+struct pmutex {
+    spinlock_t lock __attribute__((aligned (64))) ;
+    uint8_t  flags __attribute__((aligned (64)));
+    uint64_t count_calls;
+    uint64_t count_locks;
+    uint64_t count_trylocks;
+    uint64_t count_spins;
+#define OUTPUT_COUNT 1000
+    uint64_t last_output;
 };
 
 struct ticket_semaphore{
@@ -28,11 +34,17 @@ struct ticket_semaphore{
 };
 
 struct psemaphore{
+    spinlock_t lock __attribute__((aligned (64)));
   int sleepcount;
-  spinlock_t lock;
   int count;
   nk_wait_queue_t  *wait_queue;
   uint8_t flags;
+  uint64_t count_calls;
+  uint64_t count_locks;
+  uint64_t count_trylocks;
+  uint64_t count_spins;
+  uint64_t last_output;
+
 };
 
 struct thread_with_signal{

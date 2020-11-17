@@ -19,7 +19,7 @@
 #define ZOMBIE 500  //after busy wait for ZOMBIE time check condition
 #define ZOMBIE_mode false //Put to sleep if true after ZOMBIE time
 
-#define TICKET_LOCK 1
+#define TICKET_LOCK 0
 //retrive osHandle from thread
 #define poffsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #define pcontainer_of(ptr, type, member) ({                      \
@@ -64,6 +64,7 @@ pte_osResult pte_osMutexCreate(pte_osMutexHandle *pHandle){
    nk_ticket_lock_init(*pHandle);
 #else
    *pHandle = malloc(sizeof(struct pmutex));
+   memset(*pHandle, 0, sizeof(**pHandle));
    spinlock_init(&((*pHandle)->lock));
 #endif
    DEBUG("osMutexCreate\n");
@@ -100,7 +101,21 @@ pte_osResult pte_osMutexLock(pte_osMutexHandle handle){
     nk_ticket_lock(handle);
 #else
 #if SIMPLE_SPIN
-   spin_lock(&(handle->lock));
+    handle->count_locks++;
+    handle->count_spins++;
+    while (__sync_lock_test_and_set(&(handle->lock), 1)) {
+	handle->count_spins++;
+	nk_yield();
+	// spin away
+    }
+    //   spin_lock(&(handle->lock));
+
+    if ((handle->count_locks - handle->last_output) > OUTPUT_COUNT) {
+	handle->last_output = handle->count_calls;
+	ERROR("lock %p : %lu locks, %lu spins\n",
+	      handle, handle->count_locks, handle->count_spins);
+    }
+	
 #else	
   handle->flags = STATE_LOCK(&(handle->lock));
 #endif
@@ -124,7 +139,19 @@ pte_osResult pte_osMutexTimedLock(pte_osMutexHandle handle, unsigned int timeout
     res = nk_ticket_trylock(handle);
 #else
 #if SIMPLE_SPIN
-   res = spin_try_lock(&(handle->lock));
+    handle->count_trylocks++;
+    handle->count_spins++;
+
+    res = __sync_lock_test_and_set(&(handle->lock), 1);
+
+  //   spin_lock(&(handle->lock));
+
+    if ((handle->count_trylocks - handle->last_output) > OUTPUT_COUNT) {
+	handle->last_output = handle->count_calls;
+	ERROR("semaphore %p : %lu locks, %lu trylocks, %lu spins\n",
+	      handle, handle->count_locks, handle->count_trylocks, handle->count_spins);
+    }
+    //   res = spin_try_lock(&(handle->lock));
 #else
    res=STATE_TRY_LOCK(&(handle->lock), &(handle->flags) );
 #endif
@@ -488,11 +515,20 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
 #else
 #if SIMPLE_SPIN
     spin_lock(&(handle->lock));
+    handle->count_spins++;
+    
+    if((handle->count_locks-handle->last_output) > OUTPUT_COUNT ){
+       handle->last_output = handle->count_calls;
+       ERROR("semaphore %p %lu dec %lu spins\n", handle, handle->count_locks, handle->count_spins);
+    }
 #else
     handle->flags = STATE_LOCK(&(handle->lock));
 #endif
-#endif  
+#endif 
+       
        if(handle->count > 0){
+
+         handle->count_locks++;
 	 handle->count--;
          //pte_osAtomicDecrement(&(handle->count));;
 #if TICKET_LOCK

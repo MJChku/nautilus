@@ -17,7 +17,7 @@
 
 #define SIMPLE_SPIN 1
 #define ZOMBIE 500  //after busy wait for ZOMBIE time check condition
-#define ZOMBIE_mode false //Put to sleep if true after ZOMBIE time
+#define ZOMBIE_mode true //Put to sleep if true after ZOMBIE time
 
 #define TICKET_LOCK 0
 //retrive osHandle from thread
@@ -110,8 +110,8 @@ pte_osResult pte_osMutexLock(pte_osMutexHandle handle){
     }
     //   spin_lock(&(handle->lock));
 
-    if ((handle->count_locks - handle->last_output) > OUTPUT_COUNT) {
-	handle->last_output = handle->count_calls;
+    if ((handle->count_spins - handle->last_output) > OUTPUT_COUNT) {
+	handle->last_output = handle->count_spins;
 	ERROR("lock %p : %lu locks, %lu spins\n",
 	      handle, handle->count_locks, handle->count_spins);
     }
@@ -517,8 +517,8 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
     spin_lock(&(handle->lock));
     handle->count_spins++;
     
-    if((handle->count_locks-handle->last_output) > OUTPUT_COUNT ){
-       handle->last_output = handle->count_calls;
+    if((handle->count_spins-handle->last_output) > OUTPUT_COUNT ){
+       handle->last_output = handle->count_spins;
        ERROR("semaphore %p %lu dec %lu spins\n", handle, handle->count_locks, handle->count_spins);
     }
 #else

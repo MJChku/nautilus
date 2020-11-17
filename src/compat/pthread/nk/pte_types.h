@@ -21,7 +21,7 @@ struct pmutex {
     uint64_t count_locks;
     uint64_t count_trylocks;
     uint64_t count_spins;
-#define OUTPUT_COUNT 1000
+#define OUTPUT_COUNT 100
     uint64_t last_output;
 };
 

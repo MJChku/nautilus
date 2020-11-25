@@ -98,6 +98,8 @@ if ((parms = (thread_parms *) malloc (sizeof (*parms))) == NULL)
 
   return osResult;
 FAIL0:
+  NK_PROFILE_EXIT();
+
 
   return (result);
 

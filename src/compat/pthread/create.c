@@ -22,7 +22,7 @@ pthread_create (pthread_t * ptid,
  */
 {
 
-  DEBUG("thread create and start\n")	
+  DEBUG("thread create and start\n");	
   NK_PROFILE_ENTRY();
 
   register pthread_attr_t a;

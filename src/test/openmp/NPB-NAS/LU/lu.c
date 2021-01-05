@@ -48,23 +48,34 @@ static boolean flag[ISIZ1/2*2+1];
 /* function declarations */
 static void blts (int nx, int ny, int nz, int k,
 		  double omega,
-		  double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
-		  double ldz[ISIZ1][ISIZ2][5][5],
-		  double ldy[ISIZ1][ISIZ2][5][5],
-		  double ldx[ISIZ1][ISIZ2][5][5],
-		  double d[ISIZ1][ISIZ2][5][5],
+		  double ****v,
+		  double ****ldz,
+		  double ****ldy,
+		  double ****ldx,
+		  double ****d,
+//		  double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
+//		  double ldz[ISIZ1][ISIZ2][5][5],
+//		  double ldy[ISIZ1][ISIZ2][5][5],
+//		  double ldx[ISIZ1][ISIZ2][5][5],
+//		  double d[ISIZ1][ISIZ2][5][5],
 		  int ist, int iend, int jst, int jend,
 		  int nx0, int ny0 );
 static void buts(int nx, int ny, int nz, int k,
 		 double omega,
-		 double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
+		 double ****v,
+//		 double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
 		 double tv[ISIZ1][ISIZ2][5],
-		 double d[ISIZ1][ISIZ2][5][5],
-		 double udx[ISIZ1][ISIZ2][5][5],
-		 double udy[ISIZ1][ISIZ2][5][5],
-		 double udz[ISIZ1][ISIZ2][5][5],
+		 double ****d,
+		 double ****udx,
+		 double ****udy,
+		 double ****udz,
+//		 double d[ISIZ1][ISIZ2][5][5],
+//		 double udx[ISIZ1][ISIZ2][5][5],
+//		 double udy[ISIZ1][ISIZ2][5][5],
+//		 double udz[ISIZ1][ISIZ2][5][5],
 		 int ist, int iend, int jst, int jend,
 		 int nx0, int ny0 );
+
 static void domain(void);
 static void erhs(void);
 static void error(void);
@@ -74,7 +85,8 @@ static void jacu(int k);
 static void l2norm (int nx0, int ny0, int nz0,
 		    int ist, int iend,
 		    int jst, int jend,
-		    double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
+		    double ****v,
+//		    double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
 		    double sum[5]);
 static void pintgr(void);
 static void read_input(void);
@@ -86,6 +98,46 @@ static void ssor(void);
 static void verify(double xcr[5], double xce[5], double xci,
 		   char *class, boolean *verified);
 
+
+/* Static to Dynamic -  Helper Functions */
+static void * arr_malloc(int d, int *dn);
+static void arr_init(void);
+/* Bump Allocator & Helper*/
+static void * __m=0;
+static void * __o=0;
+#define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
+
+#define _malloc(n) ({ if (!__m) { __m = malloc(1UL<<33);__o=__m; if(!__m){printf("no __m\n"); }} void *__r = __m; unsigned long long  __n = ALIGN(n, 8);  __m+=__n; __r; })
+
+#define _free() free(__o)
+static
+void* arr_malloc(int dd, int* dn){
+   if( dd == 1){
+       return (void*) _malloc(sizeof(double)*dn[0]);
+  }
+   void** a =(void**) _malloc(sizeof(void*)*dn[0]);
+   for (int i = 0; i < dn[0]; i++){
+      //printf("%d\n",dn[0]);
+      a[i] = arr_malloc(dd-1, dn+1);
+   }
+
+   return (void*)a;
+}
+
+static void arr_init(void){
+	int param1[4] = {ISIZ1, ISIZ2/2*2+1, ISIZ3/2*2+1, 5};
+	u	= (double****) arr_malloc(4, param1);
+	rsd	= (double****) arr_malloc(4, param1);
+	frct	= (double****) arr_malloc(4, param1);
+	flux	= (double****) arr_malloc(4, param1);
+
+	int param2[4] = {ISIZ1, ISIZ2, 5, 5};
+
+	a	= (double****) arr_malloc(4, param2);
+	b	= (double****) arr_malloc(4, param2);
+	c	= (double****) arr_malloc(4, param2);
+	d	= (double****) arr_malloc(4, param2);
+}
 /*--------------------------------------------------------------------
       program applu
 --------------------------------------------------------------------*/
@@ -114,7 +166,7 @@ return 0;
 }
 
 int program_LU(char * _buf, void *_priv) {
-
+arr_init();
 /*--------------------------------------------------------------------
 c
 c   driver for the performance evaluation of the solver for
@@ -198,6 +250,7 @@ c   verification test
 		  maxtime, mflops, "          floating point", verified, 
 		  NPBVERSION, COMPILETIME, CS1, CS2, CS3, CS4, CS5, CS6, 
 		  "(none)");
+  _free();
 }
 
 /*--------------------------------------------------------------------
@@ -209,11 +262,16 @@ static void blts (int nx, int ny, int nz, int k,
 c   To improve cache performance, second two dimensions padded by 1 
 c   for even number sizes only.  Only needed in v.
 --------------------------------------------------------------------*/
-		  double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
-		  double ldz[ISIZ1][ISIZ2][5][5],
-		  double ldy[ISIZ1][ISIZ2][5][5],
-		  double ldx[ISIZ1][ISIZ2][5][5],
-		  double d[ISIZ1][ISIZ2][5][5],
+		  double ****v,
+		  double ****ldz,
+		  double ****ldy,
+		  double ****ldx,
+		  double ****d,
+//		  double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
+//		  double ldz[ISIZ1][ISIZ2][5][5],
+//		  double ldy[ISIZ1][ISIZ2][5][5],
+//		  double ldx[ISIZ1][ISIZ2][5][5],
+//		  double d[ISIZ1][ISIZ2][5][5],
 		  int ist, int iend, int jst, int jend,
 		  int nx0, int ny0 ) {
 /*--------------------------------------------------------------------
@@ -446,12 +504,17 @@ static void buts(int nx, int ny, int nz, int k,
 c   To improve cache performance, second two dimensions padded by 1 
 c   for even number sizes only.  Only needed in v.
 --------------------------------------------------------------------*/
-		 double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
+		 double ****v,
+//		 double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
 		 double tv[ISIZ1][ISIZ2][5],
-		 double d[ISIZ1][ISIZ2][5][5],
-		 double udx[ISIZ1][ISIZ2][5][5],
-		 double udy[ISIZ1][ISIZ2][5][5],
-		 double udz[ISIZ1][ISIZ2][5][5],
+		 double ****d,
+		 double ****udx,
+		 double ****udy,
+		 double ****udz,
+//		 double d[ISIZ1][ISIZ2][5][5],
+//		 double udx[ISIZ1][ISIZ2][5][5],
+//		 double udy[ISIZ1][ISIZ2][5][5],
+//		 double udz[ISIZ1][ISIZ2][5][5],
 		 int ist, int iend, int jst, int jend,
 		 int nx0, int ny0 ) {
 /*--------------------------------------------------------------------
@@ -2010,7 +2073,8 @@ static void l2norm (int nx0, int ny0, int nz0,
 c   To improve cache performance, second two dimensions padded by 1 
 c   for even number sizes only.  Only needed in v.
 --------------------------------------------------------------------*/
-		    double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
+		      double ****v,
+//		    double v[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5],
 		    double sum[5]) {
 
 #pragma omp parallel 

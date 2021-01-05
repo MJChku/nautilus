@@ -43,6 +43,7 @@ c   for even number sizes only
 c-------------------------------------------------------------------*/
 
 /* common /fields/ */
+/*
 static double u       [5][IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1],
 	      us      [IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1],
               vs      [IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1],
@@ -55,7 +56,19 @@ static double u       [5][IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1],
               rhs     [5][IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1],
               forcing [5][IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1],
               lhs     [15][IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-
+*/
+static double ****u      ,
+	      ***us      ,
+              ***vs      ,
+              ***ws      ,
+              ***qs      ,
+              ***ainv    ,
+              ***rho_i   ,
+              ***speed   ,
+	      ***square  ,
+              ****rhs    ,
+              ****forcing ,
+              ****lhs     ;
 /* common /work_1d/ */
 static double cv[PROBLEM_SIZE], rhon[PROBLEM_SIZE],
               rhos[PROBLEM_SIZE], rhoq[PROBLEM_SIZE],

@@ -90,8 +90,8 @@ static int zend[3];
 #define	EXPMAX	(NITER_DEFAULT*(NX*NX/4+NY*NY/4+NZ*NZ/4))
 
 /* COMMON block: excomm */
-static double ex[EXPMAX+1];	/* ex(0:expmax) */
-
+//static double ex[EXPMAX+1];	/* ex(0:expmax) */
+static double *ex;
 /*
 c roots of unity array
 c relies on x being largest dimension?

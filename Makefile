@@ -600,7 +600,7 @@ ifneq ($(NAUT_CONFIG_CXX_SUPPORT)a,a)
 ifeq ($(NAUT_CONFIG_TOOLCHAIN_ROOT)a,""a)
 ifeq ($(CROSS_COMPILE)a, a)
 # guess where the std libs are 
-  libs-y += `locate libstdc++.a | head -1`
+  libs-y += `locate libstdc++.a | tail -1`
 else
   libs-y += $(CROSS_COMPILE)/../lib64/libstdc++.a
 endif

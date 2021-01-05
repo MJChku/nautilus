@@ -83,7 +83,7 @@ nk_register_shell_cmd(nas_bt_impl);
 
 
 int program_BT_profile(char *_, void *__){
-   
+  
 #ifdef NAUT_CONFIG_PROFILE
       nk_instrument_clear();
       nk_instrument_start();
@@ -97,11 +97,72 @@ return 0;
 }
 
 
+#define IMAX    PROBLEM_SIZE
+#define JMAX    PROBLEM_SIZE
+#define KMAX    PROBLEM_SIZE
+
+static void * __m=0;
+static void * __o=0;
+#define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
+
+#define _malloc(n) ({ if (!__m) { __m = malloc(1UL<<33);__o=__m; if(!__m){printf("no __m\n"); }} void *__r = __m; unsigned long long  __n = ALIGN(n, 8);  __m+=__n; __r; })
+#define _free() free(__o)
+static 
+void* arr_malloc(int d, int* dn){
+   if( d == 1){
+       return (void*) _malloc(sizeof(double)*dn[0]);
+  }
+   void** a =(void**) _malloc(sizeof(void*)*dn[0]);
+   for (int i = 0; i < dn[0]; i++){
+      //printf("%d\n",dn[0]);
+      a[i] = arr_malloc(d-1, dn+1);
+   }
+
+   return (void*)a;
+}
+
 /*--------------------------------------------------------------------
       program BT
 c-------------------------------------------------------------------*/
 static int program_BT(char *__buf, void* __priv) {
-    
+int us_params[3]={IMAX/2*2+1,JMAX/2*2+1, KMAX/2*2+1};
+us = (void*) arr_malloc(3, us_params);
+
+int vs_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+vs = (void*) arr_malloc(3, vs_params);
+
+int ws_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+ws = (void*) arr_malloc(3, ws_params);
+
+int qs_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+qs = (void*) arr_malloc(3, qs_params);
+
+int rho_i_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+rho_i = (void*) arr_malloc(3, rho_i_params);
+
+int square_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+square = (void*) arr_malloc(3, square_params);
+
+int forcing_params[4] = { IMAX/2*2+1, JMAX/2*2+1, KMAX/2*2+1, 5+1};
+forcing = (void*) arr_malloc(4, forcing_params);
+
+int u_params[4] = {(IMAX+1)/2*2+1,(JMAX+1)/2*2+1,(KMAX+1)/2*2+1,5};
+u = (void*) arr_malloc(4, u_params);
+
+int rhs_params[4] = {IMAX/2*2+1,JMAX/2*2+1, KMAX/2*2+1,5};
+rhs = (void*) arr_malloc(4, rhs_params);
+
+// int lhs_params[6] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1, 3, 5, 5};
+// lhs = (void*) arr_malloc(6, lhs_params);
+
+int fjac_params[5] = { IMAX/2*2+1, JMAX/2*2+1, KMAX-1+1, 5, 5};
+
+fjac = (void*) arr_malloc(5, fjac_params);
+
+int njac_params[5] = { IMAX/2*2+1, JMAX/2*2+1, KMAX-1+1, 5, 5};
+
+njac = (void*) arr_malloc(5, njac_params);
+
   int niter, step, n3;
   int nthreads = 1;
   double navg, mflops;
@@ -204,6 +265,7 @@ c-------------------------------------------------------------------*/
 		  tmax, mflops, "          floating point", 
 		  verified, NPBVERSION,COMPILETIME, CS1, CS2, CS3, CS4, CS5, 
 		  CS6, "(none)");
+  _free();
 }
 
 /*--------------------------------------------------------------------
@@ -1403,7 +1465,7 @@ c-------------------------------------------------------------------*/
 	  - tmp1 * dy5;
 
 	lhs[i][j][k][BB][0][0] = 1.0
-	  + tmp1 * 2.0 * njac[i][j][k][0][0]
+	  + tmp1 * 2.0* njac[i][j][k][0][0]
 	  + tmp1 * 2.0 * dy1;
 	lhs[i][j][k][BB][0][1] = tmp1 * 2.0 * njac[i][j][k][0][1];
 	lhs[i][j][k][BB][0][2] = tmp1 * 2.0 * njac[i][j][k][0][2];
@@ -2740,7 +2802,7 @@ c-------------------------------------------------------------------*/
       for (k = 1; k < grid_points[2]-1; k++) {
 	for (m = 0; m < BLOCK_SIZE; m++) {
 	  for (n = 0; n < BLOCK_SIZE; n++) {
-	    rhs[i][j][k][m] = rhs[i][j][k][m]
+	    rhs[i][j][k][m] = rhs[i][j][k][m];
 	      - lhs[i][j][k][CC][m][n]*rhs[i+1][j][k][n];
 	  }
 	}

@@ -288,6 +288,7 @@ static int launch_vmm_environment()
 
 extern struct naut_info * smp_ap_stack_switch(uint64_t, uint64_t, struct naut_info*);
 
+char * scripts[] = {"nas-bt","nas-lu","nas-ft","nas-sp","\0",0};
 void
 init (unsigned long mbd,
       unsigned long magic)
@@ -572,8 +573,9 @@ init (unsigned long mbd,
 #ifdef NAUT_CONFIG_WATCHDOG
     nk_watchdog_init(NAUT_CONFIG_WATCHDOG_DEFAULT_TIME_MS * 1000000UL);
 #endif
-    
-    nk_launch_shell("root-shell",0,0,0);
+       
+   // nk_launch_shell("root-shell",0,0,0);
+    nk_launch_shell("root-shell",0,scripts,0);
 
     runtime_init();
 

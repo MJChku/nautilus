@@ -1,14 +1,14 @@
-#define CLASS 'S'
+#define CLASS 'B'
 /*
    This file is generated automatically by the setparams utility.
    It sets the number of processors and the class of the NPB
    in this directory. Do not modify it by hand.   */
    
-#define COMPILETIME "25 Sep 2020"
+#define COMPILETIME "04 Jan 2021"
 #define NPBVERSION "3.0 structured"
-#define CC "clang-10"
-#define CFLAGS "-O3 -fopenmp -lomp -fnoopenmp-use-tls"
-#define CLINK "clang-10"
-#define CLINKFLAGS "-lomp"
-#define C_LIB "-lm"
-#define C_INC "-I../common "
+#define CC "(none)"
+#define CFLAGS "-o3 $(C_IN)"
+#define CLINK "(none)"
+#define CLINKFLAGS "(none)"
+#define C_LIB "(none)"
+#define C_INC "(none)"

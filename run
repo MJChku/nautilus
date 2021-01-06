@@ -1,2 +1,1 @@
-make -j isoimage
-sudo qemu-system-x86_64 --enable-kvm -smp 4,cores=4 -m 12G -vga std -serial stdio -cdrom nautilus.iso -gdb tcp::1234
+qemu-system-x86_64 --enable-kvm -cpu host  -smp 16,cores=16 -m 16G -curses -serial file:serial1.out -serial file:serial2.out -vga std -cdrom nautilus.iso -gdb tcp::1234

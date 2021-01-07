@@ -92,7 +92,8 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 
               if (result == 0)
                 {
-                  nk_semaphore_release(mx->sem);
+                 // nk_semaphore_release(mx->sem);
+		 ssem_destroy(mx->sem);
 
                   free(mx);
 

@@ -145,9 +145,11 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
           while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
             {
               if(abstime == NULL){
-	         nk_semaphore_down(mx->sem);
+	         //nk_semaphore_down(mx->sem);
+		 ssem_wait(mx->sem);
 	      }
-	      else if (0 != (result = nk_semaphore_down_timeout(mx->sem, timeout_ns)))
+	      //else if (0 != (result = nk_semaphore_down_timeout(mx->sem, timeout_ns)))
+	      else if (0 != (result = ssem_timedwait(mx->sem, timeout_ns)))
                 {
                   return ETIMEDOUT;
                 }
@@ -181,9 +183,11 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
               while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
                 {
 		  if(abstime == NULL){
-                    nk_semaphore_down(mx->sem);
+                   // nk_semaphore_down(mx->sem);
+		   ssem_wait(mx->sem);
                   }
-                  else if (0 != (result = nk_semaphore_down_timeout(mx->sem, timeout_ns)))
+                  //else if (0 != (result = nk_semaphore_down_timeout(mx->sem, timeout_ns)))
+                  else if (0 != (result = ssem_timedwait(mx->sem, timeout_ns)))
                     {
                       return ETIMEDOUT;
                     }

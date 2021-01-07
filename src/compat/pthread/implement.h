@@ -148,8 +148,8 @@ struct sem_t_
 struct pthread_mutex_t_
   {
     //pte_osSemaphoreHandle handle;
-    struct nk_semaphore *sem;
-    
+    //struct nk_semaphore *sem;
+    simple_sem_t *sem; 
     int lock_idx;
     /* Provides exclusive access to mutex state
     				   via the Interlocked* mechanism.

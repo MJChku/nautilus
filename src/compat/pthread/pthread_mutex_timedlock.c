@@ -49,6 +49,7 @@
 #include "implement.h"
 
 
+//not used 
 static int
 pte_timed_eventwait (pte_osSemaphoreHandle event, const struct timespec *abstime)
 /*

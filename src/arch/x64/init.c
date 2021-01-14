@@ -288,7 +288,8 @@ static int launch_vmm_environment()
 
 extern struct naut_info * smp_ap_stack_switch(uint64_t, uint64_t, struct naut_info*);
 
-char * scripts[] = {"nas-bt","nas-lu","nas-ft","nas-sp","\0",0};
+//char * scripts[] = {"nas-bt","nas-lu","nas-ft","nas-sp","\0",0};
+char * scripts[] = {"ompb","\0",0};
 void
 init (unsigned long mbd,
       unsigned long magic)

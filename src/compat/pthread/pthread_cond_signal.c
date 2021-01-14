@@ -11,6 +11,7 @@ int
 pthread_cond_signal (pthread_cond_t * c)
 {
     	
+    DEBUG("Condvar signaling on (%p)\n", (void*)c);
     if (c == NULL)
     {
       return EINVAL;

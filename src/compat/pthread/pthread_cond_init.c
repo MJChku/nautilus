@@ -33,6 +33,7 @@ pthread_cond_init (pthread_cond_t * c, const pthread_condattr_t * attr)
     memset(c, 0, sizeof(pthread_cond_t));
 
     snprintf(buf,NK_WAIT_QUEUE_NAME_LEN,"condvar%lu-wait",__sync_fetch_and_add(&count,1));
+    c->sem = malloc(sizeof(simple_sem_t)); 
     ssem_init(c->sem, 0);
     // c->wait_queue = nk_wait_queue_create(buf);
 

@@ -118,8 +118,10 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
 
         NK_UNLOCK(&c->lock);
 	
+    DEBUG("Condvar before ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 	ssem_wait(c->sem);
         
+    DEBUG("Condvar after ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 	NK_LOCK(&c->lock);
 
         if (bc != *(volatile unsigned*)&(c->bcast_seq)) {

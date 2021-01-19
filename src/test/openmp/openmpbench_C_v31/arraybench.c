@@ -61,7 +61,7 @@ int arraybench_main(int argc, char **argv) {
     benchmark(testName, &testcopyprivnew);
 #endif
 
-#if 0
+#if 1
     /* TEST  THREADPRIVATE - COPYIN */
     sprintf(testName, "COPYIN %d", IDA);
     benchmark(testName, &testthrprivnew);

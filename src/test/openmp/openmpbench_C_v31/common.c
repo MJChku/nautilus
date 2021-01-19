@@ -328,8 +328,8 @@ void benchmark(char *name, void (*test)(void))
 // For the Cray compiler on HECToR we need to turn off optimisation 
 // for the delay and array_delay functions. Other compilers should
 // not be afffected. 
-#pragma _CRI noopt
-void delay(int delaylength) {
+//#pragma _CRI noopt
+void __attribute__((optnone)) delay(int delaylength) {
 
     int i;
     float a = 0.;
@@ -341,7 +341,7 @@ void delay(int delaylength) {
 
 }
 
-void array_delay(int delaylength, double a[1]) {
+void __attribute__((optnone)) array_delay(int delaylength, double a[1]) {
 
     int i;
     a[0] = 1.0;

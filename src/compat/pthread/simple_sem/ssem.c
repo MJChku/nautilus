@@ -4,6 +4,7 @@
 #include <nautilus/scheduler.h>
 
 #define SLEEP_COUNT  0x10 
+#define SPIN_TIME_NS 5000
 
 void ssem_init(simple_sem_t *s, int initial_count){
   NK_LOCK_INIT(&s->lock);
@@ -96,8 +97,25 @@ void ssem_wait( simple_sem_t *s){
     
    //int ori =  __sync_fetch_and_sub(&(s->count), 1);
    int wait_count = 0;   
+   int busy_wait = 0;
+   
    while(1){
 
+    busy_wait = ssem_timedwait(s, SPIN_TIME_NS);
+    if (busy_wait == 0){
+       return;
+    }else{
+           s->sleepcount++;
+           DEBUG("ssem wait in queue sem %p\n", s);
+           //NK_UNLOCK(&s->lock);
+          // nk_wait_queue_sleep(&s->wait_queue);
+           force_sleep(s);
+           DEBUG("ssem wait wakeup in queue sem %p\n", s);
+    }
+   }
+	   
+	   
+/*
       if(s == NULL){
 	DEBUG("ssem wait return  on NULL\n");
         return;
@@ -126,4 +144,6 @@ void ssem_wait( simple_sem_t *s){
       }
    }
     NK_UNLOCK(&s->lock);
+*/
+    
 }

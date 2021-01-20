@@ -74,6 +74,8 @@ if ((parms = (thread_parms *) malloc (sizeof (*parms))) == NULL)
   int cpu_num = (++COUNT)% sys->num_cpus;
   
   int ret = nk_thread_start((void*)(&pte_thread_start), parms, NULL, 0, (nk_stack_size_t)stack_size, ptid, cpu_num);
+
+  //int ret = nk_thread_start((void*)(&pte_thread_start), parms, NULL, 0, (nk_stack_size_t)1UL<<27, ptid, cpu_num);
   if (ret != 0){
     ERROR("create error exit\n");
     osResult = PTE_OS_NO_RESOURCES;

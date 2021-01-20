@@ -191,6 +191,7 @@ INT_TYPE test_index_array[TEST_ARRAY_SIZE],
 /***********************/
 /* function prototypes */
 /***********************/
+extern double timer_read(int);
 static double	randlc( double *X, double *A );
 
 void full_verify( void );

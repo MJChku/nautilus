@@ -97,7 +97,7 @@ return 0;
 }
 
 
-
+/*
 static void * __m=0;
 #define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
 
@@ -119,12 +119,12 @@ void* arr_malloc(int d, int* dn){
    return (void*)a;
 }
 
-
+*/
 /*--------------------------------------------------------------------
       program BT
 c-------------------------------------------------------------------*/
 static int program_BT(char *__buf, void* __priv) {
-    
+  /*  
 
 
 int us_params[3]={IMAX/2*2+1,JMAX/2*2+1, KMAX/2*2+1};
@@ -166,7 +166,7 @@ int njac_params[5] = { IMAX/2*2+1, JMAX/2*2+1, KMAX-1+1, 5, 5};
 njac = (void*) arr_malloc(5, njac_params);
 
 
-
+*/
 
   int niter, step, n3;
   int nthreads = 1;
@@ -270,7 +270,7 @@ c-------------------------------------------------------------------*/
 		  tmax, mflops, "          floating point", 
 		  verified, NPBVERSION,COMPILETIME, CS1, CS2, CS3, CS4, CS5, 
 		  CS6, "(none)"); 
-  _free(__m);
+//  _free(__m);
 }
 
 /*--------------------------------------------------------------------

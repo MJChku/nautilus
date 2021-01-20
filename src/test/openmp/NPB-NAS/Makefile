@@ -6,7 +6,7 @@ obj-y += common/\
 	rand/
 #EP and MG conflicts with others
 
-obj-y += \
+#obj-y += \
 	 SP/\
 	 LU/\
 	 IS/\
@@ -15,6 +15,21 @@ obj-y += \
          EP/\
          MG/\
         BT/
+
+#obj-y+= \
+	MG/\
+	CG/\
+	LU/
+
+#obj-y+= IS/
+
+#obj-y+= \
+	EP/\
+	SP/
+
+obj-y+= \
+	BT/
+
 #obj-y+= common/\
 	rand/\
 	FT/

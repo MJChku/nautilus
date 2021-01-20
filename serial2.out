@@ -1,0 +1,212 @@
+CPU ? (): dev: devices inited
+CPU ? (): chardev: init
+CPU ? (): blkdev: init
+CPU ? (): netdev: init
+Welcome to                                         
+    _   __               __   _  __                
+   / | / /____ _ __  __ / /_ (_)/ /__  __ _____    
+  /  |/ // __ `// / / // __// // // / / // ___/    
+ / /|  // /_/ // /_/ // /_ / // // /_/ /(__  )     
+/_/ |_/ \__,_/ \__,_/ \__//_//_/ \__,_//____/  
++===============================================+  
+ Kyle C. Haled (c) 2014 | Northwestern University   
++===============================================+  
+
+Detected GenuineIntel Processor
+CPU ? (): DEBUG: Increasing kern end to 0x519587df
+CPU ? (): DEBUG: Increasing kern end to 0x51959271
+BOOTMEM: Setting up boot memory allocator
+BOOTMEM: Memory map[0] - [0x00000000 - 0x0009f000] <usable RAM>
+BOOTMEM: Memory map[1] - [0x000a0000 - 0x000a0000] <reserved>
+BOOTMEM: Memory map[2] - [0x000f0000 - 0x00100000] <reserved>
+BOOTMEM: Memory map[3] - [0x00100000 - 0xbffe0000] <usable RAM>
+BOOTMEM: Memory map[4] - [0xbffe0000 - 0xc0000000] <reserved>
+BOOTMEM: Memory map[5] - [0xfeffc000 - 0xff000000] <reserved>
+BOOTMEM: Memory map[6] - [0xfffc0000 - 0x100000000] <reserved>
+BOOTMEM: Memory map[7] - [0x100000000 - 0x340000000] <usable RAM>
+BOOTMEM: Detected 12287.523264 MB (6657 pages) of usable System RAM
+CPU ? (): DEBUG: Multiboot info size 496B
+CPU ? (): DEBUG: Image load base: 0x100040
+CPU ? (): DEBUG: Kernel Cmd line: 
+CPU ? (): DEBUG: Boot loader: GRUB 2.02-2ubuntu8.18
+CPU ? (): DEBUG: Unhandled tag type (0xa)
+CPU ? (): DEBUG: Found module: 
+CPU ? (): DEBUG:   type:     0x00000003
+CPU ? (): DEBUG:   size:     0x00000011
+CPU ? (): DEBUG:   mod_start 0x5193a000
+CPU ? (): DEBUG:   mod_end   0x519587df
+CPU ? (): DEBUG:   args:     
+CPU ? (): DEBUG: Found symbol table module
+CPU ? (): DEBUG: Found module: 
+CPU ? (): DEBUG:   type:     0x00000003
+CPU ? (): DEBUG:   size:     0x00000011
+CPU ? (): DEBUG:   mod_start 0x51959000
+CPU ? (): DEBUG:   mod_end   0x51959271
+CPU ? (): DEBUG:   args:     
+CPU ? (): ERROR at src/nautilus/module.c(73): Found unknown module (magic=0x00952800)
+CPU ? (): DEBUG: Multiboot2 memory map detected
+CPU ? (): DEBUG: ELF size=20, num=0, entsize=0, shndx=0, sechdr=0x519396bc
+CPU ? (): DEBUG: Multiboot2 basic meminfo detected
+CPU ? (): DEBUG: Boot device: (biosdev=0xe0,slice=4294967295,part=4294967295)
+CPU ? (): DEBUG: fb addr: 0x000b8000, fb_width: 80, fb_height: 25
+CPU ? (): DEBUG: Old ACPI: rsdp=0x51939710
+ACPI: Parsing ACPI root table (at 0x000f68a0)
+ACPI: RSDP 00000000000f68a0 00014 (v00 BOCHS )
+ACPI: RSDT 00000000bffe1712 00030 (v01 BOCHS  BXPCRSDT 00000001 BXPC 00000001)
+ACPI: root table checksum pass
+ACPI: FACP 00000000bffe1556 00074 (v01 BOCHS  BXPCFACP 00000001 BXPC 00000001)
+ACPI: APIC 00000000bffe164a 00090 (v01 BOCHS  BXPCAPIC 00000001 BXPC 00000001)
+ACPI: HPET 00000000bffe16da 00038 (v01 BOCHS  BXPCHPET 00000001 BXPC 00000001)
+ACPI: Done parsing ACPI root table
+SMP: Detected 4 CPUs
+NUMA: Parsing ACPI NUMA information...
+NUMA: DONE.
+CPU ? (): WARNING: NUMA: Associate Domains using ADHOC METHOD
+Remapping phys mem [0x00000000 - 0x340000000] with 2MB pages
+CPU ? (): KMEM: Malloc configured to support a maximum of: 0x2fff7f000 bytes of physical memory
+BOOTMEM: Adding boot memory regions to the kernel memory pool:
+BOOTMEM:     [Domain 00 : Region 00] (0.00 MB)
+BOOTMEM:     [Domain 00 : Region 01] (1749.24768 MB)
+BOOTMEM:     [Domain 00 : Region 02] (9663.676416 MB)
+BOOTMEM:     =======
+BOOTMEM:     [TOTAL] (11412.701184 MB)
+Disabling legacy 8259 PIC
+Initializing i8254 PIT
+CPU 0 (P 0 "*none*"): dev: Added device with name i8254, type 2, flags 0x0
+CPU 0 (P 0 "*none*"): dev: Added device with name ioapic0, type 1, flags 0x0
+CPU 0 (P 0 "*none*"): waitqueue: inited
+CPU 0 (P 0 "*none*"): future: inited (seeded pool with 256 futures)
+CPU 0 (P 0 "*none*"): timer: Timers inited
+CPU 0 (P 0 "*none*"): APIC: Detected APIC 0x0 at 1000048000 Hz and cycles per us as 4197 (core at 4197000000 Hz) calibration mode=0
+CPU 0 (P 0 "*none*"): APIC: Detected APIC 0x0 CPU cycles per tick as 67 cycles (min was 67)
+CPU 0 (P 0 "*none*"): dev: Added device with name apic0, type 1, flags 0x0
+CPU 0 (P 0 "*none*"): semaphore: inited
+CPU 0 (P 0 "*none*"): msg_queue: inited
+CPU 0 (P 0 "*none*"): ps2: init
+CPU 0 (P 0 "*none*"): dev: Added device with name ps2-keyboard, type 0, flags 0x0
+PCI: Probing PCI bus...
+PCI: 0000:00:00.0 8086:1237 (rev 2)
+PCI: 0000:00:01.0 8086:7000 (rev 0)
+PCI: [0000:01.0] Multifunction Device detected
+PCI: 0000:00:01.1 8086:7010 (rev 0)
+PCI: 0000:00:01.3 8086:7113 (rev 3)
+PCI: 0000:00:02.0 1234:1111 (rev 2)
+PCI: 0000:00:03.0 8086:100e (rev 3)
+CPU 0 (P 0 "*none*"): dev: Added device with name pci0, type 3, flags 0x0
+CPU 0 (P 0 "*none*"): dev: Added device with name isa, type 3, flags 0x0
+CPU 0 (P 0 "*none*"): Scheduler: Initializing scheduler on BSP
+CPU 0 (P 1 "*unnamed*"): group_sched: Inited
+BOOTMEM: Reclaiming boot sections and data:
+BOOTMEM:     [Boot alloc. page map] (0.840 MB)
+BOOTMEM:     [Boot page tables and stack]     (0.4096 MB)
+BOOTMEM:     =======
+BOOTMEM:     [TOTAL] (2.110280 MB)
+BOOTMEM:     Boot allocation range: 0x51c00000-0x57811d00
+CPU 0 (P 1 "*unnamed*"): KMEM:    boot range: 0x51c00000-0x57811d00   kmem private: 0x51c10000-0x57811d00
+SMP: Setting up cross-core IPI event queue
+CPU 1 (P 0 "*none*"): dev: Added device with name apic1, type 1, flags 0x0
+CPU 2 (P 0 "*none*"): dev: Added device with name apic2, type 1, flags 0x0
+CPU 3 (P 0 "*none*"): dev: Added device with name apic3, type 1, flags 0x0
+MWAIT not supported
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name vga, type 0, flags 0x0
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name serial-boot, type 0, flags 0x0
+CPU 0 (P 1 "*unnamed*"): chardev: register device serial0
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name serial0, type 4, flags 0x0
+CPU 0 (P 1 "*unnamed*"): chardev: register device serial1
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name serial1, type 4, flags 0x0
+CPU 0 (P 1 "*unnamed*"): vc: init
+CPU 0 (P 1 "*unnamed*"): vc: List launched
+List of VCs (space to regenerate, plus for new shell)
+
+a : default
+b : system-log
+c : vc-list
+CPU 0 (P 1 "*unnamed*"): fs: inited
+PMC: Initializing PMC subsystem
+CPU 0 (P 1 "*unnamed*"): WARNING : PMC: Insufficient Intel PMC version to support perf counter subsystem
+CPU 0 (P 1 "*unnamed*"): WARNING : PMC: Disabling PMC subsystem
+CPU 0 (P 1 "*unnamed*"): CMDLINE: parsing kernel cmdline arguments 
+CPU 0 (P 1 "*unnamed*"): Shell root-shell launched on cpu 0 as 000000000017e000
+Nautilus boot thread yielding (indefinitely)
+root-shell> nas-cg
+
+
+ NAS Parallel Benchmarks 3.0 structured OpenMP C version - CG Benchmark
+ Size:     150000
+ Iterations:    75
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: sc_nprocessors_onln 
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: _SC_THREADS 67
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: _sc_thread_threads_max 76
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: sc_thread_stack_min 75
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(650): Function (syscall) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(944): Function (atexit) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(961): Function (sigemptyset) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 1 (P 7 "*unnamed*"): ERROR at src/compat/pthread/pthread_setcancelstate.c(51): Function (pthread_setcancelstate) is BOGUS
+CPU 2 (P 8 "*unnamed*"): ERROR at src/compat/pthread/pthread_setcancelstate.c(51): Function (pthread_setcancelstate) is BOGUS
+CPU 3 (P 9 "*unnamed*"): ERROR at src/compat/pthread/pthread_setcancelstate.c(51): Function (pthread_setcancelstate) is BOGUS
+   iteration           ||r||                 zeta
+        1       4.8302970110721501683e-131.0999944232373979958e2
+        2       1.0811947614184652433e-152.7392043714652572817e1
+        3       1.1350605905508198006e-152.8033976184027480372e1
+        4       1.1656754265908996099e-152.8419150755128697483e1
+        5       1.1885052205011743101e-152.8647167003889322245e1
+        6       1.1945984901334825634e-152.8781296941841205239e1
+        7       1.2007578414548663934e-152.8860045853734334287e1
+        8       1.2039229733584937603e-152.8906314557268444787e1
+        9       1.2056474297758430507e-152.8933564921462149755e1
+       10       1.2091472008466450125e-152.8949669544900260121e1
+       11       1.2079393470527466131e-152.8959226335375433337e1
+       12       1.2104625676905565324e-152.8964923348488895272e1
+       13       1.2089652583518712354e-152.8968335924893651168e1
+       14       1.2098578583437897754e-152.8970390396000539113e1
+       15       1.2065203167847582293e-152.8971633622837074995e1
+       16       1.2090786795852174855e-152.8972389860085314695e1
+       17       1.2088012414839706352e-152.8972852269222883592e1
+       18       1.2127712695172210221e-152.8973136479777835461e1
+       19       1.206266654873779481e-152.8973312056928747893e1
+       20       1.210815032649854313e-152.897342106637469783e1
+       21       1.2151088026008138167e-152.8973489076055415126e1
+       22       1.2136379017407603468e-152.8973531706487150927e1
+       23       1.2048199602263109106e-152.8973558549725822786e1
+       24       1.2122862847829929452e-152.8973575525664827524e1
+       25       1.2127419453214189159e-152.8973586305938226815e1
+       26       1.2042000012742978266e-152.8973593178737360176e1
+       27       1.2099193773953527294e-152.8973597576737077475e1
+       28       1.2133512617091636431e-152.8973600400998918758e1
+       29       1.2078810116665249002e-152.8973602220677136643e1
+       30       1.2101090836194311178e-152.8973603396762712237e1
+       31       1.2049431068906442405e-152.8973604159115680545e1
+       32       1.2057059944874557252e-152.8973604654640482181e1
+       33       1.2096587553450316327e-152.8973604977561379314e1
+       34       1.2091306869394885523e-152.8973605188509978348e1
+       35       1.2100249985369511274e-152.8973605326624621625e1
+       36       1.20624801213396715e-152.8973605417245465787e1
+       37       1.2060796924663605284e-152.8973605476822612559e1
+       38       1.2103800282730041626e-152.8973605516063869914e1
+       39       1.2054865505447451577e-152.8973605541957311971e1
+       40       1.206474105573871962e-152.8973605559069966375e1
+       41       1.2055452473935667918e-152.8973605570397594988e1
+       42       1.2091576731784739564e-152.8973605577907363795e1
+       43       1.200855049203472803e-152.8973605582893426913e1
+       44       1.2063377430159842617e-152.8973605586207213491e1
+       45       1.2010503476395195159e-152.8973605588413207101e1
+       46       1.2019851129529500535e-152.8973605589882438949e1
+       47       1.2072167007939278812e-152.8973605590862945292e1
+       48       1.2087762216999950352e-152.8973605591517923585e1
+       49       1.2058210742876267939e-152.8973605591955376326e1
+       50       1.2061458699723380401e-152.8973605592248532048e1
+       51       1.2081377151280946046e-152.8973605592444911849e1
+       52       1.2018385150204475626e-152.8973605592576049617e1
+       53       1.2063276268446958631e-152.8973605592664611663e1
+       54       1.2083447284717854871e-152.897360559272358671e1

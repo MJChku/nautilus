@@ -72,6 +72,15 @@ static void bubble( double ten[M][2], int j1[M][2], int j2[M][2],
 static void zero3(double ***z, int n1, int n2, int n3);
 static void nonzero(double ***z, int n1, int n2, int n3);
 
+static void * __m=0;
+static void * __o=0;
+#define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
+
+#define _malloc(n) ({ if (!__m) { __m = malloc(1UL<<33);__o=__m; if(!__m){printf("no __m\n"); }} void *__r = __m; unsigned long long  __n = ALIGN(n, 8);  __m+=__n; __r; })
+
+//#define _malloc(n) malloc(n)
+#define _free() free(__o)
+
 /*--------------------------------------------------------------------
       program mg
 c-------------------------------------------------------------------*/
@@ -225,30 +234,30 @@ c-------------------------------------------------------------------*/
 
     setup(&n1,&n2,&n3,lt);
       
-    u = (double ****)malloc((lt+1)*sizeof(double ***));
+    u = (double ****)_malloc((lt+1)*sizeof(double ***));
     for (l = lt; l >=1; l--) {
-	u[l] = (double ***)malloc(m3[l]*sizeof(double **));
+	u[l] = (double ***)_malloc(m3[l]*sizeof(double **));
 	for (k = 0; k < m3[l]; k++) {
-	    u[l][k] = (double **)malloc(m2[l]*sizeof(double *));
+	    u[l][k] = (double **)_malloc(m2[l]*sizeof(double *));
 	    for (j = 0; j < m2[l]; j++) {
-		u[l][k][j] = (double *)malloc(m1[l]*sizeof(double));
+		u[l][k][j] = (double *)_malloc(m1[l]*sizeof(double));
 	    }
 	}
     }
-    v = (double ***)malloc(m3[lt]*sizeof(double **));
+    v = (double ***)_malloc(m3[lt]*sizeof(double **));
     for (k = 0; k < m3[lt]; k++) {
-	v[k] = (double **)malloc(m2[lt]*sizeof(double *));
+	v[k] = (double **)_malloc(m2[lt]*sizeof(double *));
 	for (j = 0; j < m2[lt]; j++) {
-	    v[k][j] = (double *)malloc(m1[lt]*sizeof(double));
+	    v[k][j] = (double *)_malloc(m1[lt]*sizeof(double));
 	}
     }
-    r = (double ****)malloc((lt+1)*sizeof(double ***));
+    r = (double ****)_malloc((lt+1)*sizeof(double ***));
     for (l = lt; l >=1; l--) {
-	r[l] = (double ***)malloc(m3[l]*sizeof(double **));
+	r[l] = (double ***)_malloc(m3[l]*sizeof(double **));
 	for (k = 0; k < m3[l]; k++) {
-	    r[l][k] = (double **)malloc(m2[l]*sizeof(double *));
+	    r[l][k] = (double **)_malloc(m2[l]*sizeof(double *));
 	    for (j = 0; j < m2[l]; j++) {
-		r[l][k][j] = (double *)malloc(m1[l]*sizeof(double));
+		r[l][k][j] = (double *)_malloc(m1[l]*sizeof(double));
 	    }
 	}
     }
@@ -354,6 +363,7 @@ c---------------------------------------------------------------------*/
 		    nit, nthreads, t, mflops, "          floating point", 
 		    verified, NPBVERSION, COMPILETIME,
 		    CS1, CS2, CS3, CS4, CS5, CS6, CS7);
+    _free();
 }
 
 /*--------------------------------------------------------------------

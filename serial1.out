@@ -1,0 +1,256 @@
+CPU ? (): dev: devices inited
+CPU ? (): chardev: init
+CPU ? (): blkdev: init
+CPU ? (): netdev: init
+Welcome to                                         
+    _   __               __   _  __                
+   / | / /____ _ __  __ / /_ (_)/ /__  __ _____    
+  /  |/ // __ `// / / // __// // // / / // ___/    
+ / /|  // /_/ // /_/ // /_ / // // /_/ /(__  )     
+/_/ |_/ \__,_/ \__,_/ \__//_//_/ \__,_//____/  
++===============================================+  
+ Kyle C. Hale (c) 2014 | Northwestern University   
++===============================================+  
+
+Detected GenuineIntel Processor
+CPU ? (): DEBUG: Increasing kern end to 0x4dd9eadb
+CPU ? (): DEBUG: Increasing kern end to 0x4dd9f271
+BOOTMEM: Setting up boot memory allocator
+BOOTMEM: Memory map[0] - [0x00000000 - 0x0009f000] <usable RAM>
+BOOTMEM: Memory map[1] - [0x000a0000 - 0x000a0000] <reserved>
+BOOTMEM: Memory map[2] - [0x000f0000 - 0x00100000] <reserved>
+BOOTMEM: Memory map[3] - [0x00100000 - 0xbffe0000] <usable RAM>
+BOOTMEM: Memory map[4] - [0xbffe0000 - 0xc0000000] <reserved>
+BOOTMEM: Memory map[5] - [0xfeffc000 - 0xff000000] <reserved>
+BOOTMEM: Memory map[6] - [0xfffc0000 - 0x100000000] <reserved>
+BOOTMEM: Memory map[7] - [0x100000000 - 0x340000000] <usable RAM>
+BOOTMEM: Detected 12287.523264 MB (6657 pages) of usable System RAM
+CPU ? (): DEBUG: Multiboot info size 496B
+CPU ? (): DEBUG: Image load base: 0x100040
+CPU ? (): DEBUG: Kernel Cmd line: 
+CPU ? (): DEBUG: Boot loader: GRUB 2.02-2ubuntu8.18
+CPU ? (): DEBUG: Unhandled tag type (0xa)
+CPU ? (): DEBUG: Found module: 
+CPU ? (): DEBUG:   type:     0x00000003
+CPU ? (): DEBUG:   size:     0x00000011
+CPU ? (): DEBUG:   mod_start 0x4dd7e000
+CPU ? (): DEBUG:   mod_end   0x4dd9eadb
+CPU ? (): DEBUG:   args:     
+CPU ? (): DEBUG: Found symbol table module
+CPU ? (): DEBUG: Found module: 
+CPU ? (): DEBUG:   type:     0x00000003
+CPU ? (): DEBUG:   size:     0x00000011
+CPU ? (): DEBUG:   mod_start 0x4dd9f000
+CPU ? (): DEBUG:   mod_end   0x4dd9f271
+CPU ? (): DEBUG:   args:     
+CPU ? (): ERROR at src/nautilus/module.c(73): Found unknown module (magic=0x00952800)
+CPU ? (): DEBUG: Multiboot2 memory map detected
+CPU ? (): DEBUG: ELF size=20, num=0, entsize=0, shndx=0, sechdr=0x4dd9ec5c
+CPU ? (): DEBUG: Multiboot2 basic meminfo detected
+CPU ? (): DEBUG: Boot device: (biosdev=0xe0,slice=4294967295,part=4294967295)
+CPU ? (): DEBUG: fb addr: 0x000b8000, fb_width: 80, fb_height: 25
+CPU ? (): DEBUG: Old ACPI: rsdp=0x4dd9ecb0
+ACPI: Parsing ACPI root table (at 0x000f68a0)
+ACPI: RSDP 00000000000f68a0 00014 (v00 BOCHS )
+ACPI: RSDT 00000000bffe1712 00030 (v01 BOCHS  BXPCRSDT 00000001 BXPC 00000001)
+ACPI: root table checksum pass
+ACPI: FACP 00000000bffe1556 00074 (v01 BOCHS  BXPCFACP 00000001 BXPC 00000001)
+ACPI: APIC 00000000bffe164a 00090 (v01 BOCHS  BXPCAPIC 00000001 BXPC 00000001)
+ACPI: HPET 00000000bffe16da 00038 (v01 BOCHS  BXPCHPET 00000001 BXPC 00000001)
+ACPI: Done parsing ACPI root table
+SMP: Detected 4 CPUs
+NUMA: Parsing ACPI NUMA information...
+NUMA: DONE.
+CPU ? (): WARNING: NUMA: Associate Domains using ADHOC METHOD
+Remapping phys mem [0x00000000 - 0x340000000] with 1GB pages
+CPU ? (): KMEM: Malloc configured to support a maximum of: 0x2fff7f000 bytes of physical memory
+BOOTMEM: Adding boot memory regions to the kernel memory pool:
+BOOTMEM:     [Domain 00 : Region 00] (0.00 MB)
+BOOTMEM:     [Domain 00 : Region 01] (1811.939328 MB)
+BOOTMEM:     [Domain 00 : Region 02] (9663.676416 MB)
+BOOTMEM:     =======
+BOOTMEM:     [TOTAL] (11475.615744 MB)
+Disabling legacy 8259 PIC
+Initializing i8254 PIT
+CPU 0 (P 0 "*none*"): dev: Added device with name i8254, type 2, flags 0x0
+CPU 0 (P 0 "*none*"): dev: Added device with name ioapic0, type 1, flags 0x0
+CPU 0 (P 0 "*none*"): waitqueue: inited
+CPU 0 (P 0 "*none*"): future: inited (seeded pool with 256 futures)
+CPU 0 (P 0 "*none*"): timer: Timers inited
+CPU 0 (P 0 "*none*"): APIC: Detected APIC 0x0 at 1000192000 Hz and cycles per us as 4198 (core at 4198000000 Hz) calibration mode=0
+CPU 0 (P 0 "*none*"): APIC: Detected APIC 0x0 CPU cycles per tick as 66 cycles (min was 66)
+CPU 0 (P 0 "*none*"): dev: Added device with name apic0, type 1, flags 0x0
+CPU 0 (P 0 "*none*"): semaphore: inited
+CPU 0 (P 0 "*none*"): msg_queue: inited
+CPU 0 (P 0 "*none*"): ps2: init
+CPU 0 (P 0 "*none*"): dev: Added device with name ps2-keyboard, type 0, flags 0x0
+PCI: Probing PCI bus...
+PCI: 0000:00:00.0 8086:1237 (rev 2)
+PCI: 0000:00:01.0 8086:7000 (rev 0)
+PCI: [0000:01.0] Multifunction Device detected
+PCI: 0000:00:01.1 8086:7010 (rev 0)
+PCI: 0000:00:01.3 8086:7113 (rev 3)
+PCI: 0000:00:02.0 1234:1111 (rev 2)
+PCI: 0000:00:03.0 8086:100e (rev 3)
+CPU 0 (P 0 "*none*"): dev: Added device with name pci0, type 3, flags 0x0
+CPU 0 (P 0 "*none*"): dev: Added device with name isa, type 3, flags 0x0
+CPU 0 (P 0 "*none*"): Scheduler: Initializing scheduler on BSP
+CPU 0 (P 1 "*unnamed*"): group_sched: Inited
+BOOTMEM: Reclaiming boot sections and data:
+BOOTMEM:     [Boot alloc. page map] (0.840 MB)
+BOOTMEM:     [Boot page tables and stack]     (0.4096 MB)
+BOOTMEM:     =======
+BOOTMEM:     [TOTAL] (2.110280 MB)
+BOOTMEM:     Boot allocation range: 0x4e000000-0x53c04d00
+CPU 0 (P 1 "*unnamed*"): KMEM:    boot range: 0x4e000000-0x53c04d00   kmem private: 0x4e003000-0x53c04d00
+SMP: Setting up cross-core IPI event queue
+CPU 1 (P 0 "*none*"): dev: Added device with name apic1, type 1, flags 0x0
+CPU 2 (P 0 "*none*"): dev: Added device with name apic2, type 1, flags 0x0
+CPU 3 (P 0 "*none*"): dev: Added device with name apic3, type 1, flags 0x0
+MWAIT not supported
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name vga, type 0, flags 0x0
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name serial-boot, type 0, flags 0x0
+CPU 0 (P 1 "*unnamed*"): chardev: register device serial0
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name serial0, type 4, flags 0x0
+CPU 0 (P 1 "*unnamed*"): chardev: register device serial1
+CPU 0 (P 1 "*unnamed*"): dev: Added device with name serial1, type 4, flags 0x0
+CPU 0 (P 1 "*unnamed*"): vc: init
+List of VCs (space to regenerate, plus for new shell)
+
+a : default
+b : system-log
+c : vc-list
+CPU 0 (P 1 "*unnamed*"): vc: List launched
+CPU 0 (P 1 "*unnamed*"): fs: inited
+PMC: Initializing PMC subsystem
+CPU 0 (P 1 "*unnamed*"): CMDLINE: parsing kernel cmdline arguments 
+CPU 0 (P 1 "*unnamed*"): Shell root-shell launched on cpu 0 as 000000000017e000
+Nautilus boot thread yielding (indefinitely)root-shell> 
+nas-ft
+
+
+ NAS Parallel Benchmarks 3.0 structured OpenMP C version - FT Benchmark(Bump-Allocator)
+
+ Size                : 512x256x256
+ Iterations          :          20
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: sc_nprocessors_onln 
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: _SC_THREADS 67
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: _sc_thread_threads_max 76
+CPU 0 (P 6 "root-shell"): DEBUG: sysconf: sc_thread_stack_min 75
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(650): Function (syscall) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(944): Function (atexit) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(961): Function (sigemptyset) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 0 (P 6 "root-shell"): ERROR at src/compat/libccompat/libccompat.c(958): Function (sigaction) undefined
+CPU 1 (P 7 "*unnamed*"): ERROR at src/compat/pthread/pthread_setcancelstate.c(51): Function (pthread_setcancelstate) is BOGUS
+CPU 3 (P 9 "*unnamed*"): ERROR at src/compat/pthread/pthread_setcancelstate.c(51): Function (pthread_setcancelstate) is BOGUS
+CPU 2 (P 8 "*unnamed*"): ERROR at src/compat/pthread/pthread_setcancelstate.c(51): Function (pthread_setcancelstate) is BOGUS
+T =     1     Checksum = 5.177643571579344552447e2 5.077803458597217058923e2
+T =     2     Checksum = 5.154521291263090461143e2 5.088249431599306262797e2
+T =     3     Checksum = 5.146409228649654323817e2 5.096208912658868257495e2
+T =     4     Checksum = 5.142378756213305450729e2 5.101023387619054005881e2
+T =     5     Checksum = 5.139626667737229581689e2 5.103976610617664846359e2
+T =     6     Checksum = 5.137423460082031851925e2 5.105948019802390831501e2
+T =     7     Checksum = 5.135547056878078819864e2 5.107404165783018470393e2
+T =     8     Checksum = 5.133910925466552725993e2 5.10857657366147122957e2
+T =     9     Checksum = 5.132470705389685008413e2 5.109577278523446466352e2
+T =    10     Checksum = 5.13119772998409871434e2 5.11046030448301735305e2
+T =    11     Checksum = 5.130070319283150865886e2 5.11125243379986443415e2
+T =    12     Checksum = 5.129070537031703906905e2 5.111968077718508993712e2
+T =    13     Checksum = 5.128182883502623781169e2 5.112616233063822619442e2
+T =    14     Checksum = 5.127393733383082690125e2 5.113203605551142345575e2
+T =    15     Checksum = 5.126691062020504432439e2 5.113735928093328766408e2
+T =    16     Checksum = 5.126064276004536850451e2 5.114218460548492544149e2
+T =    17     Checksum = 5.12550407657035975717e2 5.11465613976030908816e2
+T =    18     Checksum = 5.125002331720570509788e2 5.115053595965949284619e2
+T =    19     Checksum = 5.124551951845994608448e2 5.115415130407231458776e2
+T =    20     Checksum = 5.124146770029359458931e2 5.115744692211363826573e2
+Result verification successful
+class = B
+
+
+ FT Benchmark Completed
+ Class           =                        B
+ Size            =              512x256x256
+ Iterations      =                       20
+ Threads         =                        4
+ Time in seconds =             9.63596
+ Mop/s total     =             9553.13129394
+ Operation type  =           floating point
+ Verification    =               SUCCESSFUL
+ Version         =           3.0 structured
+ Compile date    =              04 Jan 2021
+
+ Compile options:
+    CC           = (none)
+    CLINK        = (none)
+    C_LIB        = (none)
+    C_INC        = (none)
+    CFLAGS       = -o3 $(C_IN)
+    CLINKFLAGS   = (none)
+    RAND         = (none)
+root-shell> nas-ft
+
+
+ NAS Parallel Benchmarks 3.0 structured OpenMP C version - FT Benchmark(Bump-Allocator)
+
+ Size                : 512x256x256
+ Iterations          :          20
+T =     1     Checksum = 5.177643725885147887311e2 5.077803609927552770387e2
+T =     2     Checksum = 5.154521444879795808447e2 5.088249583240955757901e2
+T =     3     Checksum = 5.146409382024601200101e2 5.096209064537729318545e2
+T =     4     Checksum = 5.14237890946813422488e2 5.101023539641397519517e2
+T =     5     Checksum = 5.139626820910040123636e2 5.103976762728020730719e2
+T =     6     Checksum = 5.137423613189181423877e2 5.105948171971499505162e2
+T =     7     Checksum = 5.135547209929309246945e2 5.107404317995524252183e2
+T =     8     Checksum = 5.133911078469020594639e2 5.108576725908916955632e2
+T =     9     Checksum = 5.132470858349231548345e2 5.109577430800715660553e2
+T =    10     Checksum = 5.131197882905707956525e2 5.110460456786602776447e2
+T =    11     Checksum = 5.130070472171159963182e2 5.111252586127057497833e2
+T =    12     Checksum = 5.129070689889917957771e2 5.111968230067029708152e2
+T =    13     Checksum = 5.128183036334382904897e2 5.11261638543165986448e2
+T =    14     Checksum = 5.127393886191323417734e2 5.113203757936484521451e2
+T =    15     Checksum = 5.12669121480780404454e2 5.113736080494535372054e2
+T =    16     Checksum = 5.126064428773156578245e2 5.114218612964079397898e2
+T =    17     Checksum = 5.125504229322284572845e2 5.11465629218894036967e2
+T =    18     Checksum = 5.125002484457542095697e2 5.11505374840642559775e2
+T =    19     Checksum = 5.124552104569544326296e2 5.115415282858482441952e2
+T =    20     Checksum = 5.124146922740833360876e2 5.115744844672436784094e2
+Result verification successful
+class = B
+
+
+ FT Benchmark Completed
+ Class           =                        B
+ Size            =              512x256x256
+ Iterations      =                       20
+ Threads         =                        4
+ Time in seconds =             9.71251
+ Mop/s total     =             9477.8374512
+ Operation type  =           floating point
+ Verification    =             UNSUCCESSFUL
+ Version         =           3.0 structured
+ Compile date    =              04 Jan 2021
+
+ Compile options:
+    CC           = (none)
+    CLINK        = (none)
+    C_LIB        = (none)
+    C_INC        = (none)
+    CFLAGS       = -o3 $(C_IN)
+    CLINKFLAGS   = (none)
+    RAND         = (none)
+CPU 0 (P 6 "root-shell"): ERROR at src/nautilus/mm/kmem.c(656): KMEM: Failed to find entry for block 0000000100000000 in kmem_free()
+CPU 0 (P 6 "root-shell"): ERROR at src/nautilus/mm/kmem.c(657): KMEM: 00000000003df0d5
+CPU 0 (P 6 "root-shell"): ERROR at src/nautilus/mm/kmem.c(657): KMEM: 000000000037029c
+CPU 0 (P 6 "root-shell"): ERROR at src/nautilus/mm/kmem.c(657): KMEM: 000000000036f250
+root-shell> 

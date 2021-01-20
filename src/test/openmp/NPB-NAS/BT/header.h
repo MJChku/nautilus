@@ -60,31 +60,31 @@ c   for even number sizes only.
 
 /* COMMON block: fields */
 
-static double*** us;
-static double*** vs;
-static double*** ws;
-static double*** qs;
-static double*** rho_i;
-static double*** square;
+//static double*** us;
+//static double*** vs;
+//static double*** ws;
+//static double*** qs;
+//static double*** rho_i;
+//static double*** square;
 
-static double **** forcing;
-static double **** u;
-static double **** rhs;
+//static double **** forcing;
+//static double **** u;
+//static double **** rhs;
 //static double ****** lhs;
 
-static double ***** fjac;
-static double ***** njac;
+//static double ***** fjac;
+//static double ***** njac;
 
-// static double us[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double vs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double ws[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double qs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double rho_i[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double square[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double forcing[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5+1];
-// static double u[(IMAX+1)/2*2+1][(JMAX+1)/2*2+1][(KMAX+1)/2*2+1][5];
-// static double rhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5];
- static double lhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][3][5][5];
+static double us[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double vs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double ws[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double qs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double rho_i[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double square[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double forcing[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5+1];
+static double u[(IMAX+1)/2*2+1][(JMAX+1)/2*2+1][(KMAX+1)/2*2+1][5];
+static double rhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5];
+static double lhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][3][5][5];
 
 /* COMMON block: work_1d */
 double cuf[PROBLEM_SIZE];
@@ -99,9 +99,9 @@ c   to arrays) padded by 1 for even number sizes only.
 */
 
 /* COMMON block: work_lhs */
-// static double fjac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
-// /* fjac(5, 5, 0:IMAX/2*2, 0:JMAX/2*2, 0:KMAX-1) */
-// static double njac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
+static double fjac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
+/* fjac(5, 5, 0:IMAX/2*2, 0:JMAX/2*2, 0:KMAX-1) */
+static double njac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
 /* njac(5, 5, 0:IMAX/2*2, 0:JMAX/2*2, 0:KMAX-1) */
 static double tmp1, tmp2, tmp3;
 

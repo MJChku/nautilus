@@ -1,0 +1,1 @@
+#define NAUT_CONFIG_X86_64_HOST 1

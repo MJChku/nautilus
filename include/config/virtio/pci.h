@@ -1,0 +1,1 @@
+#undef NAUT_CONFIG_VIRTIO_PCI

@@ -51,6 +51,8 @@ c---------------------------------------------------------------------
 #include <nautilus/shell.h>
 #include "../math/nas_math.h"
 
+#include <nautilus/pmc.h>
+
 #define	NZ	NA*(NONZER+1)*(NONZER+1)+NA*(NONZER+2)
 
 /* global variables */
@@ -106,7 +108,7 @@ static void vecset(int n, double v[], int iv[], int *nzv, int i, double val);
 /*--------------------------------------------------------------------
       program cg
 --------------------------------------------------------------------*/
-static int program_CG(char *__buf, void* __priv);
+static int program_CG(int choice);
 int program_CG_profile(char *_, void *__);
 
 static struct shell_cmd_impl nas_cg_impl = {
@@ -120,22 +122,39 @@ nk_register_shell_cmd(nas_cg_impl);
 c-------------------------------------------------------------------*/
 
 int program_CG_profile(char *_, void *__){
-   
-#ifdef NAUT_CONFIG_PROFILE
-      nk_instrument_clear();
-      nk_instrument_start();
-#endif      
-      program_CG(_,__);
-#ifdef NAUT_CONFIG_PROFILE
-      nk_instrument_end();
-      nk_instrument_query();
-#endif
-return 0;
+    int index = -1;
+    int apicid = 0;
+    if(sscanf(_,"nas-cg %d %d ", &apicid,  &index)!=2){
+       printf("input apicid and pmc index \n");
+       return 0;
+    }
+
+
+      nk_thread_t* cur = get_cur_thread();
+
+      struct sys_info * sys = per_cpu_get(system);
+
+      int cpuid = 0;
+      for (int cpu=0;cpu<sys->num_cpus;cpu++) {
+            printf("cpu id %d, apicid %d,\n", cpu, sys->cpus[cpu]->apic->id);
+            if(sys->cpus[cpu]->apic->id ==apicid){
+               cpuid = cpu;
+            }
+      }
+            //omp_set_num_threads(64);
+      nk_thread_id_t tid = NULL;
+
+      nk_thread_create(program_CG, index, NULL, 0, 0, &tid, cpuid);
+
+      nk_thread_t * newthread = (nk_thread_t*) (tid);
+      newthread->vc = cur->vc;
+
+      nk_thread_run(newthread);   
 }
 
 
 
-static int program_CG(char *__buf, void* __priv) {
+static int program_CG(int index) {
 
 
     int	i, j, k, it;
@@ -148,6 +167,16 @@ static int program_CG(char *__buf, void* __priv) {
     char class;
     boolean verified;
     double zeta_verify_value, epsilon;
+
+    //PMC
+    int choice = 0;
+    int enable_pmc = 0;
+    if(index>=0){
+        enable_pmc = 1;
+        choice = index;
+    }else{
+        choice = 0;
+    }
 
     firstrow = 1;
     lastrow  = NA;
@@ -278,6 +307,13 @@ c-------------------------------------------------------------------*/
 
 
     timer_clear( 1 );
+    //PMC start
+  perf_event_t *perf = nk_pmc_create(choice);
+  uint64_t  start_cnt = 0;
+  if(enable_pmc){
+  	nk_pmc_start(perf);
+	start_cnt = nk_pmc_read(perf);
+  }
     timer_start( 1 );
 
 /*--------------------------------------------------------------------
@@ -334,6 +370,13 @@ c-------------------------------------------------------------------*/
 } /* end parallel */
 
     timer_stop( 1 );
+    long stop_cnt = 0;
+  if(enable_pmc){
+  	stop_cnt = nk_pmc_read(perf);
+	nk_pmc_stop(perf);
+  }
+
+  nk_pmc_destroy(perf);
 
 /*--------------------------------------------------------------------
 c  End of timed section
@@ -374,6 +417,19 @@ c-------------------------------------------------------------------*/
 		    mflops, "          floating point", 
 		    verified, NPBVERSION, COMPILETIME,
 		    CS1, CS2, CS3, CS4, CS5, CS6, CS7);
+//PMC print
+        if(enable_pmc){
+                 char intel_event[10][128] = {
+                        "Unhalted Core Cycles",
+                        "Instructions Retired",
+                        "Unhalted Reference Cycles",
+                        "LLC References",
+                        "LLC Misses",
+                        "Branch Instructions Retired",
+                        "Branch Misses Retired",
+                };
+                    printf("%s : %ld \n",intel_event[choice],(stop_cnt-start_cnt));
+        }
 }
 
 /*--------------------------------------------------------------------

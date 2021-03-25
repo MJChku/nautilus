@@ -35,8 +35,20 @@
 #include "../common/npb-C.h"
 #include <nautilus/shell.h>
 
+//PMC
+#include <nautilus/pmc.h>
+#include <nautilus/monitor.h>
+
+
 /* global variables */
 #include "header.h"
+#define vga_putchar(x) nk_vc_putchar(x);
+#define DB(x) vga_putchar(x)
+#define DHN(x) vga_putchar(((x & 0xF) >= 10) ? (((x & 0xF) - 10) + 'a') : ((x & 0xF) + '0'))
+#define DHB(x) DHN(x >> 4) ; DHN(x);
+#define DHW(x) DHB(x >> 8) ; DHB(x);
+#define DHL(x) DHW(x >> 16) ; DHW(x);
+#define DHQ(x) DHL(x >> 32) ; DHL(x);
 
 /* function declarations */
 static void add(void);
@@ -71,7 +83,7 @@ static void z_solve_cell(void);
 
 
 
-static int program_BT(char *__buf, void* __priv);
+static int program_BT(int choice);
 int program_BT_profile(char *_, void* __);
 
 static struct shell_cmd_impl nas_bt_impl = {
@@ -83,17 +95,36 @@ nk_register_shell_cmd(nas_bt_impl);
 
 
 int program_BT_profile(char *_, void *__){
-   
-#ifdef NAUT_CONFIG_PROFILE
-      nk_instrument_clear();
-      nk_instrument_start();
-#endif      
-      program_BT(_,__);
-#ifdef NAUT_CONFIG_PROFILE
-      nk_instrument_end();
-      nk_instrument_query();
-#endif
-return 0;
+
+    int index = -1;
+    int apicid = 0;
+    if(sscanf(_,"nas-bt %d %d ", &apicid,  &index)!=2){
+       printf("input apicid and pmc index \n");
+       return 0;
+    }
+
+
+      nk_thread_t* cur = get_cur_thread();
+
+      struct sys_info * sys = per_cpu_get(system);
+
+      int cpuid = 0;
+      for (int cpu=0;cpu<sys->num_cpus;cpu++) {
+            printf("cpu id %d, apicid %d,\n", cpu, sys->cpus[cpu]->apic->id);
+            if(sys->cpus[cpu]->apic->id ==apicid){
+               cpuid = cpu;
+            }
+      }
+            //omp_set_num_threads(64);
+      nk_thread_id_t tid = NULL;
+
+      nk_thread_create(program_BT, index, NULL, 0, 0, &tid, cpuid);
+
+      nk_thread_t * newthread = (nk_thread_t*) (tid);
+      newthread->vc = cur->vc;
+
+      nk_thread_run(newthread);
+
 }
 
 
@@ -123,7 +154,7 @@ void* arr_malloc(int d, int* dn){
 /*--------------------------------------------------------------------
       program BT
 c-------------------------------------------------------------------*/
-static int program_BT(char *__buf, void* __priv) {
+static int program_BT(int index) {
   /*  
 
 
@@ -176,6 +207,23 @@ njac = (void*) arr_malloc(5, njac_params);
   boolean verified;
   char class;
   //FILE *fp;
+  //PMC
+  uint64_t tst1 = 1234567890123;
+  uint64_t tst2 = 12345678901234;
+  uint64_t tst3 = 1234567890123;
+  printf("tst1 : %lld \n",tst1);
+  printf("tst2 : %lld \n",tst2);
+  printf("tst3 : %ld \n",tst3);
+  printf("tst4 : %lld \n",(tst2-tst1));
+  int choice = 0;
+  int enable_pmc = 0;
+  if(index>=0){
+      enable_pmc = 1;
+      choice = index;
+  }else{
+      choice = 0;
+  }
+
 
 /*--------------------------------------------------------------------
 c      Root node reads input file (if it exists) else takes
@@ -232,6 +280,13 @@ c-------------------------------------------------------------------*/
   initialize();
 
   timer_clear(1);
+  perf_event_t *perf = nk_pmc_create(choice);
+  uint64_t start_cnt = 0;
+  if(enable_pmc){
+        nk_pmc_start(perf);
+        start_cnt = nk_pmc_read(perf);
+  }
+
   timer_start(1);
    
   for (step = 1; step <= niter; step++) {
@@ -253,6 +308,14 @@ c-------------------------------------------------------------------*/
 } /* end parallel */
 
   timer_stop(1);
+  //PMC
+  uint64_t stop_cnt = 0;
+  if(enable_pmc){
+        stop_cnt = nk_pmc_read(perf);
+        nk_pmc_stop(perf);
+  }
+  nk_pmc_destroy(perf);
+
   tmax = timer_read(1);
        
   verify(niter, &class, &verified);
@@ -270,6 +333,25 @@ c-------------------------------------------------------------------*/
 		  tmax, mflops, "          floating point", 
 		  verified, NPBVERSION,COMPILETIME, CS1, CS2, CS3, CS4, CS5, 
 		  CS6, "(none)"); 
+
+  //PMC print
+        if(enable_pmc){
+                 char intel_event[10][128] = {
+                        "Unhalted Core Cycles",
+                        "Instructions Retired",
+                        "Unhalted Reference Cycles",
+                        "LLC References",
+                        "LLC Misses",
+                        "Branch Instructions Retired",
+                        "Branch Misses Retired",
+                };
+		 DHQ(stop_cnt-start_cnt);
+		 vga_putchar((stop_cnt-start_cnt));
+		 printf("\n");
+		 printf("%016lx",(stop_cnt-start_cnt));
+                 printf("\n %s : %lld \n",intel_event[choice],(stop_cnt-start_cnt));
+        }
+
 //  _free(__m);
 }
 

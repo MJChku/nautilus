@@ -39,6 +39,8 @@
 
 #include <nautilus/nautilus.h>
 #include <nautilus/shell.h>
+#include <nautilus/pmc.h>
+#include <nautilus/mm.h>
 /* parameters */
 #define T_BENCH	1
 #define	T_INIT	2
@@ -71,6 +73,20 @@ static void bubble( double ten[M][2], int j1[M][2], int j2[M][2],
 		    int j3[M][2], int m, int ind );
 static void zero3(double ***z, int n1, int n2, int n3);
 static void nonzero(double ***z, int n1, int n2, int n3);
+
+static void * __m=0;
+static void * __o=0;
+#define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
+
+//#define _malloc(n) ({ if (!__m) { __m = malloc(1UL<<33);__o=__m; if(!__m){printf("no __m\n"); }} void *__r = __m; unsigned long long  __n = ALIGN(n, 16);  __m+=__n; __r; })
+
+#define N_PAGES (1024*1024*2UL*512UL)
+#define _malloc(n) ({ if (!__m) { __m = mmap(0, N_PAGES, PROT_READ | PROT_WRITE,MAP_ANONYMOUS | MAP_PRIVATE | MAP_HUGETLB, 0, 0);__o=__m; if(!__m){printf("no __m\n"); }} void *__r = __m; unsigned long long  __n = ALIGN(n, 16);  __m+=__n; __r; })
+
+//#define _malloc(n) malloc(n)
+#define _free() free(__o)
+
+
 
 /*--------------------------------------------------------------------
       program mg
@@ -110,6 +126,11 @@ c------------------------------------------------------------------------*/
     int k, it;
     double t, tinit, mflops;
     int nthreads = 1;
+    int enable_pmc = 1;
+    int choice = 0;
+    if(sscanf(_buf,"nas-mg %d", &choice)!=1){
+        enable_pmc = 0;
+    }
 
 /*-------------------------------------------------------------------------
 c These arrays are in common because they are quite large
@@ -283,6 +304,16 @@ c---------------------------------------------------------------------*/
     
 
     timer_stop(T_INIT);
+//PMC start
+    perf_event_t *perf = nk_pmc_create(choice);
+    long start_cnt = 0;
+if(enable_pmc){
+
+    nk_pmc_start(perf);
+    start_cnt = nk_pmc_read(perf);
+}
+//PMC
+
     timer_start(T_BENCH);
 
     resid(u[lt],v,r[lt],n1,n2,n3,a,lt);
@@ -303,6 +334,14 @@ c---------------------------------------------------------------------*/
 } /* end parallel */
 
     timer_stop(T_BENCH);
+//PMC END
+    long stop_cnt = 0;
+    if(enable_pmc){
+    	stop_cnt = nk_pmc_read(perf);
+    	nk_pmc_stop(perf);
+    	nk_pmc_destroy(perf);
+    }
+//PMC
     t = timer_read(T_BENCH);
     tinit = timer_read(T_INIT);
 
@@ -354,6 +393,20 @@ c---------------------------------------------------------------------*/
 		    nit, nthreads, t, mflops, "          floating point", 
 		    verified, NPBVERSION, COMPILETIME,
 		    CS1, CS2, CS3, CS4, CS5, CS6, CS7);
+//PMC print
+	if(enable_pmc){
+	  	 char intel_event[10][128] = {
+	   		"Unhalted Core Cycles",
+			"Instructions Retired",
+			"Unhalted Reference Cycles",
+			"LLC References",
+			"LLC Misses",
+			"Branch Instructions Retired",
+			"Branch Misses Retired",
+   		};
+		    printf("%s : %ld \n",intel_event[choice],(stop_cnt-start_cnt));
+	}
+    _free();
 }
 
 /*--------------------------------------------------------------------

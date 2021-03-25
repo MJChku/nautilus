@@ -60,53 +60,31 @@ c   for even number sizes only.
 
 /* COMMON block: fields */
 
-static double *us_ptr;
-static double *vs_ptr;
-static double *ws_ptr;
-static double *qs_ptr;
-static double *rho_i_ptr;
-static double *square_ptr;
-static double *forcing_ptr;
-static double *u_ptr;
-static double *rhs_ptr;
-static double *lhs_ptr;
+//static double*** us;
+//static double*** vs;
+//static double*** ws;
+//static double*** qs;
+//static double*** rho_i;
+//static double*** square;
 
-static double *fjac_ptr;
-static double *njac_ptr;
+//static double **** forcing;
+//static double **** u;
+//static double **** rhs;
+//static double ****** lhs;
 
-typedef double s_matrix_t[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-typedef double f_matrix_t[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5+1];
-typedef double u_matrix_t[(IMAX+1)/2*2+1][(JMAX+1)/2*2+1][(KMAX+1)/2*2+1][5];
-typedef double rhs_matrix_t[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5];
-typedef double lhs_matrix_t[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][3][5][5];
-typedef double jac_matrix_t[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
+//static double ***** fjac;
+//static double ***** njac;
 
-#define ACAST(T, ptr) (*(T*)ptr)
-
-#define us ACAST(s_matrix_t, us_ptr)
-#define vs ACAST(s_matrix_t, vs_ptr)
-#define ws ACAST(s_matrix_t, ws_ptr)
-#define qs ACAST(s_matrix_t, qs_ptr)
-#define rho_i ACAST(s_matrix_t, rho_i_ptr)
-#define square ACAST(s_matrix_t, square_ptr)
-#define forcing ACAST(f_matrix_t, forcing_ptr)
-#define u ACAST(u_matrix_t, u_ptr)
-#define rhs ACAST(rhs_matrix_t, rhs_ptr)
-#define lhs ACAST(lhs_matrix_t, lhs_ptr)
-#define fjac ACAST(jac_matrix_t, fjac_ptr)
-#define njac ACAST(jac_matrix_t, njac_ptr)
-
-
-// static double us[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double vs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double ws[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double qs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double rho_i[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double square[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
-// static double forcing[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5+1];
-// static double u[(IMAX+1)/2*2+1][(JMAX+1)/2*2+1][(KMAX+1)/2*2+1][5];
-// static double rhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5];
-// static double lhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][3][5][5];
+static double us[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double vs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double ws[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double qs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double rho_i[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double square[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1];
+static double forcing[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5+1];
+static double u[(IMAX+1)/2*2+1][(JMAX+1)/2*2+1][(KMAX+1)/2*2+1][5];
+static double rhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][5];
+static double lhs[IMAX/2*2+1][JMAX/2*2+1][KMAX/2*2+1][3][5][5];
 
 /* COMMON block: work_1d */
 double cuf[PROBLEM_SIZE];
@@ -121,9 +99,9 @@ c   to arrays) padded by 1 for even number sizes only.
 */
 
 /* COMMON block: work_lhs */
-// static double fjac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
-// /* fjac(5, 5, 0:IMAX/2*2, 0:JMAX/2*2, 0:KMAX-1) */
-// static double njac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
+static double fjac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
+/* fjac(5, 5, 0:IMAX/2*2, 0:JMAX/2*2, 0:KMAX-1) */
+static double njac[IMAX/2*2+1][JMAX/2*2+1][KMAX-1+1][5][5];
 /* njac(5, 5, 0:IMAX/2*2, 0:JMAX/2*2, 0:KMAX-1) */
 static double tmp1, tmp2, tmp3;
 

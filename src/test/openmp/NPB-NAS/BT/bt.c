@@ -38,9 +38,6 @@
 /* global variables */
 #include "header.h"
 
-
-#define calloc(n,s) ({ void *_p=malloc(n*s);memset(_p,0,n*s); _p;})
-
 /* function declarations */
 static void add(void);
 static void adi(void);
@@ -63,8 +60,8 @@ static void x_solve_cell(void);
 static void matvec_sub(double ablock[5][5], double avec[5], double bvec[5]);
 static void matmul_sub(double ablock[5][5], double bblock[5][5],
 		       double cblock[5][5]);
-static void binvcrhs(double llhs[5][5], double c[5][5], double r[5]);
-static void binvrhs(double llhs[5][5], double r[5]);
+static void binvcrhs(double lhs[5][5], double c[5][5], double r[5]);
+static void binvrhs(double lhs[5][5], double r[5]);
 static void y_solve(void);
 static void y_backsubstitute(void);
 static void y_solve_cell(void);
@@ -100,53 +97,76 @@ return 0;
 }
 
 
-
+/*
 static void * __m=0;
 #define ALIGN(x,a) (((x)+(a)-1)&~((a)-1))
 
 #define _malloc(n) ({ if (!__m) { __m = malloc(1UL<<33); if(!__m){printf("no __m\n"); }} void *__r = __m; unsigned long long  __n = ALIGN(n, 16);  __m+=__n; __r; })
+#define _free(m) free(m)
 
 
-static void arr_init_calloc(){
-	us_ptr = calloc(sizeof(s_matrix_t), 1);
-	vs_ptr = calloc(sizeof(s_matrix_t), 1);
-	ws_ptr = calloc(sizeof(s_matrix_t), 1);
-	qs_ptr = calloc(sizeof(s_matrix_t), 1);
-	rho_i_ptr = calloc(sizeof(s_matrix_t), 1);
-	square_ptr = calloc(sizeof(s_matrix_t), 1);
+static 
+void* arr_malloc(int d, int* dn){
+   if( d == 1){
+       return (void*) _malloc(sizeof(double)*dn[0]);
+  }
+   void** a =(void**) _malloc(sizeof(void*)*dn[0]);
+   for (int i = 0; i < dn[0]; i++){
+      //printf("%d\n",dn[0]);
+      a[i] = arr_malloc(d-1, dn+1);
+   }
 
-
-	forcing_ptr = calloc(sizeof(f_matrix_t), 1);
-	u_ptr = calloc(sizeof(u_matrix_t), 1);
-	rhs_ptr = calloc(sizeof(rhs_matrix_t), 1);
-	lhs_ptr = calloc(sizeof(lhs_matrix_t), 1);
-
-
-	fjac_ptr = calloc(sizeof(jac_matrix_t), 1);
-	njac_ptr = calloc(sizeof(jac_matrix_t), 1);
+   return (void*)a;
 }
 
-static void free_arr(){
-	free(us_ptr);
-	free(vs_ptr);
-	free(ws_ptr);
-	free(qs_ptr);
-	free(rho_i_ptr);
-	free(square_ptr);
-	free(forcing_ptr);
-	free(u_ptr);
-	free(rhs_ptr);
-	free(lhs_ptr);
-	free(fjac_ptr);
-	free(njac_ptr);
-}
-
+*/
 /*--------------------------------------------------------------------
       program BT
 c-------------------------------------------------------------------*/
 static int program_BT(char *__buf, void* __priv) {
-    
+  /*  
 
+
+int us_params[3]={IMAX/2*2+1,JMAX/2*2+1, KMAX/2*2+1};
+us = (void*) arr_malloc(3, us_params);
+
+int vs_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+vs = (void*) arr_malloc(3, vs_params);
+
+int ws_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+ws = (void*) arr_malloc(3, ws_params);
+
+int qs_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+qs = (void*) arr_malloc(3, qs_params);
+
+int rho_i_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+rho_i = (void*) arr_malloc(3, rho_i_params);
+
+int square_params[3] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1};
+square = (void*) arr_malloc(3, square_params);
+
+int forcing_params[4] = { IMAX/2*2+1, JMAX/2*2+1, KMAX/2*2+1, 5+1};
+forcing = (void*) arr_malloc(4, forcing_params);
+
+int u_params[4] = {(IMAX+1)/2*2+1,(JMAX+1)/2*2+1,(KMAX+1)/2*2+1,5};
+u = (void*) arr_malloc(4, u_params);
+
+int rhs_params[4] = {IMAX/2*2+1,JMAX/2*2+1, KMAX/2*2+1,5};
+rhs = (void*) arr_malloc(4, rhs_params);
+
+// int lhs_params[6] = {IMAX/2*2+1,JMAX/2*2+1,KMAX/2*2+1, 3, 5, 5};
+// lhs = (void*) arr_malloc(6, lhs_params);
+
+int fjac_params[5] = { IMAX/2*2+1, JMAX/2*2+1, KMAX-1+1, 5, 5};
+
+fjac = (void*) arr_malloc(5, fjac_params);
+
+int njac_params[5] = { IMAX/2*2+1, JMAX/2*2+1, KMAX-1+1, 5, 5};
+
+njac = (void*) arr_malloc(5, njac_params);
+
+
+*/
 
   int niter, step, n3;
   int nthreads = 1;
@@ -156,9 +176,7 @@ static int program_BT(char *__buf, void* __priv) {
   boolean verified;
   char class;
   //FILE *fp;
-  
-  //initialize array
-  arr_init_calloc();
+
 /*--------------------------------------------------------------------
 c      Root node reads input file (if it exists) else takes
 c      defaults from parameters
@@ -230,7 +248,7 @@ c-------------------------------------------------------------------*/
 #pragma omp master  
   nthreads = omp_get_num_threads();
 
-  printf("nthreads %d\n",nthreads);
+  //printf("nthreads %d\n",nthreads);
 #endif /* _OPENMP */
 } /* end parallel */
 
@@ -252,7 +270,7 @@ c-------------------------------------------------------------------*/
 		  tmax, mflops, "          floating point", 
 		  verified, NPBVERSION,COMPILETIME, CS1, CS2, CS3, CS4, CS5, 
 		  CS6, "(none)"); 
-  free_arr();
+//  _free(__m);
 }
 
 /*--------------------------------------------------------------------
@@ -2970,7 +2988,7 @@ c-------------------------------------------------------------------*/
 /*--------------------------------------------------------------------
 --------------------------------------------------------------------*/
 
-static void binvcrhs(double llhs[5][5], double c[5][5], double r[5]) {
+static void binvcrhs(double lhs[5][5], double c[5][5], double r[5]) {
 
 /*--------------------------------------------------------------------
 --------------------------------------------------------------------*/
@@ -2981,11 +2999,11 @@ static void binvcrhs(double llhs[5][5], double c[5][5], double r[5]) {
 c     
 c-------------------------------------------------------------------*/
 
-  pivot = 1.00/llhs[0][0];
-  llhs[0][1] = llhs[0][1]*pivot;
-  llhs[0][2] = llhs[0][2]*pivot;
-  llhs[0][3] = llhs[0][3]*pivot;
-  llhs[0][4] = llhs[0][4]*pivot;
+  pivot = 1.00/lhs[0][0];
+  lhs[0][1] = lhs[0][1]*pivot;
+  lhs[0][2] = lhs[0][2]*pivot;
+  lhs[0][3] = lhs[0][3]*pivot;
+  lhs[0][4] = lhs[0][4]*pivot;
   c[0][0] = c[0][0]*pivot;
   c[0][1] = c[0][1]*pivot;
   c[0][2] = c[0][2]*pivot;
@@ -2993,11 +3011,11 @@ c-------------------------------------------------------------------*/
   c[0][4] = c[0][4]*pivot;
   r[0]   = r[0]  *pivot;
 
-  coeff = llhs[1][0];
-  llhs[1][1]= llhs[1][1] - coeff*llhs[0][1];
-  llhs[1][2]= llhs[1][2] - coeff*llhs[0][2];
-  llhs[1][3]= llhs[1][3] - coeff*llhs[0][3];
-  llhs[1][4]= llhs[1][4] - coeff*llhs[0][4];
+  coeff = lhs[1][0];
+  lhs[1][1]= lhs[1][1] - coeff*lhs[0][1];
+  lhs[1][2]= lhs[1][2] - coeff*lhs[0][2];
+  lhs[1][3]= lhs[1][3] - coeff*lhs[0][3];
+  lhs[1][4]= lhs[1][4] - coeff*lhs[0][4];
   c[1][0] = c[1][0] - coeff*c[0][0];
   c[1][1] = c[1][1] - coeff*c[0][1];
   c[1][2] = c[1][2] - coeff*c[0][2];
@@ -3005,11 +3023,11 @@ c-------------------------------------------------------------------*/
   c[1][4] = c[1][4] - coeff*c[0][4];
   r[1]   = r[1]   - coeff*r[0];
 
-  coeff = llhs[2][0];
-  llhs[2][1]= llhs[2][1] - coeff*llhs[0][1];
-  llhs[2][2]= llhs[2][2] - coeff*llhs[0][2];
-  llhs[2][3]= llhs[2][3] - coeff*llhs[0][3];
-  llhs[2][4]= llhs[2][4] - coeff*llhs[0][4];
+  coeff = lhs[2][0];
+  lhs[2][1]= lhs[2][1] - coeff*lhs[0][1];
+  lhs[2][2]= lhs[2][2] - coeff*lhs[0][2];
+  lhs[2][3]= lhs[2][3] - coeff*lhs[0][3];
+  lhs[2][4]= lhs[2][4] - coeff*lhs[0][4];
   c[2][0] = c[2][0] - coeff*c[0][0];
   c[2][1] = c[2][1] - coeff*c[0][1];
   c[2][2] = c[2][2] - coeff*c[0][2];
@@ -3017,11 +3035,11 @@ c-------------------------------------------------------------------*/
   c[2][4] = c[2][4] - coeff*c[0][4];
   r[2]   = r[2]   - coeff*r[0];
 
-  coeff = llhs[3][0];
-  llhs[3][1]= llhs[3][1] - coeff*llhs[0][1];
-  llhs[3][2]= llhs[3][2] - coeff*llhs[0][2];
-  llhs[3][3]= llhs[3][3] - coeff*llhs[0][3];
-  llhs[3][4]= llhs[3][4] - coeff*llhs[0][4];
+  coeff = lhs[3][0];
+  lhs[3][1]= lhs[3][1] - coeff*lhs[0][1];
+  lhs[3][2]= lhs[3][2] - coeff*lhs[0][2];
+  lhs[3][3]= lhs[3][3] - coeff*lhs[0][3];
+  lhs[3][4]= lhs[3][4] - coeff*lhs[0][4];
   c[3][0] = c[3][0] - coeff*c[0][0];
   c[3][1] = c[3][1] - coeff*c[0][1];
   c[3][2] = c[3][2] - coeff*c[0][2];
@@ -3029,11 +3047,11 @@ c-------------------------------------------------------------------*/
   c[3][4] = c[3][4] - coeff*c[0][4];
   r[3]   = r[3]   - coeff*r[0];
 
-  coeff = llhs[4][0];
-  llhs[4][1]= llhs[4][1] - coeff*llhs[0][1];
-  llhs[4][2]= llhs[4][2] - coeff*llhs[0][2];
-  llhs[4][3]= llhs[4][3] - coeff*llhs[0][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[0][4];
+  coeff = lhs[4][0];
+  lhs[4][1]= lhs[4][1] - coeff*lhs[0][1];
+  lhs[4][2]= lhs[4][2] - coeff*lhs[0][2];
+  lhs[4][3]= lhs[4][3] - coeff*lhs[0][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[0][4];
   c[4][0] = c[4][0] - coeff*c[0][0];
   c[4][1] = c[4][1] - coeff*c[0][1];
   c[4][2] = c[4][2] - coeff*c[0][2];
@@ -3042,10 +3060,10 @@ c-------------------------------------------------------------------*/
   r[4]   = r[4]   - coeff*r[0];
 
 
-  pivot = 1.00/llhs[1][1];
-  llhs[1][2] = llhs[1][2]*pivot;
-  llhs[1][3] = llhs[1][3]*pivot;
-  llhs[1][4] = llhs[1][4]*pivot;
+  pivot = 1.00/lhs[1][1];
+  lhs[1][2] = lhs[1][2]*pivot;
+  lhs[1][3] = lhs[1][3]*pivot;
+  lhs[1][4] = lhs[1][4]*pivot;
   c[1][0] = c[1][0]*pivot;
   c[1][1] = c[1][1]*pivot;
   c[1][2] = c[1][2]*pivot;
@@ -3053,10 +3071,10 @@ c-------------------------------------------------------------------*/
   c[1][4] = c[1][4]*pivot;
   r[1]   = r[1]  *pivot;
 
-  coeff = llhs[0][1];
-  llhs[0][2]= llhs[0][2] - coeff*llhs[1][2];
-  llhs[0][3]= llhs[0][3] - coeff*llhs[1][3];
-  llhs[0][4]= llhs[0][4] - coeff*llhs[1][4];
+  coeff = lhs[0][1];
+  lhs[0][2]= lhs[0][2] - coeff*lhs[1][2];
+  lhs[0][3]= lhs[0][3] - coeff*lhs[1][3];
+  lhs[0][4]= lhs[0][4] - coeff*lhs[1][4];
   c[0][0] = c[0][0] - coeff*c[1][0];
   c[0][1] = c[0][1] - coeff*c[1][1];
   c[0][2] = c[0][2] - coeff*c[1][2];
@@ -3064,10 +3082,10 @@ c-------------------------------------------------------------------*/
   c[0][4] = c[0][4] - coeff*c[1][4];
   r[0]   = r[0]   - coeff*r[1];
 
-  coeff = llhs[2][1];
-  llhs[2][2]= llhs[2][2] - coeff*llhs[1][2];
-  llhs[2][3]= llhs[2][3] - coeff*llhs[1][3];
-  llhs[2][4]= llhs[2][4] - coeff*llhs[1][4];
+  coeff = lhs[2][1];
+  lhs[2][2]= lhs[2][2] - coeff*lhs[1][2];
+  lhs[2][3]= lhs[2][3] - coeff*lhs[1][3];
+  lhs[2][4]= lhs[2][4] - coeff*lhs[1][4];
   c[2][0] = c[2][0] - coeff*c[1][0];
   c[2][1] = c[2][1] - coeff*c[1][1];
   c[2][2] = c[2][2] - coeff*c[1][2];
@@ -3075,10 +3093,10 @@ c-------------------------------------------------------------------*/
   c[2][4] = c[2][4] - coeff*c[1][4];
   r[2]   = r[2]   - coeff*r[1];
 
-  coeff = llhs[3][1];
-  llhs[3][2]= llhs[3][2] - coeff*llhs[1][2];
-  llhs[3][3]= llhs[3][3] - coeff*llhs[1][3];
-  llhs[3][4]= llhs[3][4] - coeff*llhs[1][4];
+  coeff = lhs[3][1];
+  lhs[3][2]= lhs[3][2] - coeff*lhs[1][2];
+  lhs[3][3]= lhs[3][3] - coeff*lhs[1][3];
+  lhs[3][4]= lhs[3][4] - coeff*lhs[1][4];
   c[3][0] = c[3][0] - coeff*c[1][0];
   c[3][1] = c[3][1] - coeff*c[1][1];
   c[3][2] = c[3][2] - coeff*c[1][2];
@@ -3086,10 +3104,10 @@ c-------------------------------------------------------------------*/
   c[3][4] = c[3][4] - coeff*c[1][4];
   r[3]   = r[3]   - coeff*r[1];
 
-  coeff = llhs[4][1];
-  llhs[4][2]= llhs[4][2] - coeff*llhs[1][2];
-  llhs[4][3]= llhs[4][3] - coeff*llhs[1][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[1][4];
+  coeff = lhs[4][1];
+  lhs[4][2]= lhs[4][2] - coeff*lhs[1][2];
+  lhs[4][3]= lhs[4][3] - coeff*lhs[1][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[1][4];
   c[4][0] = c[4][0] - coeff*c[1][0];
   c[4][1] = c[4][1] - coeff*c[1][1];
   c[4][2] = c[4][2] - coeff*c[1][2];
@@ -3098,9 +3116,9 @@ c-------------------------------------------------------------------*/
   r[4]   = r[4]   - coeff*r[1];
 
 
-  pivot = 1.00/llhs[2][2];
-  llhs[2][3] = llhs[2][3]*pivot;
-  llhs[2][4] = llhs[2][4]*pivot;
+  pivot = 1.00/lhs[2][2];
+  lhs[2][3] = lhs[2][3]*pivot;
+  lhs[2][4] = lhs[2][4]*pivot;
   c[2][0] = c[2][0]*pivot;
   c[2][1] = c[2][1]*pivot;
   c[2][2] = c[2][2]*pivot;
@@ -3108,9 +3126,9 @@ c-------------------------------------------------------------------*/
   c[2][4] = c[2][4]*pivot;
   r[2]   = r[2]  *pivot;
 
-  coeff = llhs[0][2];
-  llhs[0][3]= llhs[0][3] - coeff*llhs[2][3];
-  llhs[0][4]= llhs[0][4] - coeff*llhs[2][4];
+  coeff = lhs[0][2];
+  lhs[0][3]= lhs[0][3] - coeff*lhs[2][3];
+  lhs[0][4]= lhs[0][4] - coeff*lhs[2][4];
   c[0][0] = c[0][0] - coeff*c[2][0];
   c[0][1] = c[0][1] - coeff*c[2][1];
   c[0][2] = c[0][2] - coeff*c[2][2];
@@ -3118,9 +3136,9 @@ c-------------------------------------------------------------------*/
   c[0][4] = c[0][4] - coeff*c[2][4];
   r[0]   = r[0]   - coeff*r[2];
 
-  coeff = llhs[1][2];
-  llhs[1][3]= llhs[1][3] - coeff*llhs[2][3];
-  llhs[1][4]= llhs[1][4] - coeff*llhs[2][4];
+  coeff = lhs[1][2];
+  lhs[1][3]= lhs[1][3] - coeff*lhs[2][3];
+  lhs[1][4]= lhs[1][4] - coeff*lhs[2][4];
   c[1][0] = c[1][0] - coeff*c[2][0];
   c[1][1] = c[1][1] - coeff*c[2][1];
   c[1][2] = c[1][2] - coeff*c[2][2];
@@ -3128,9 +3146,9 @@ c-------------------------------------------------------------------*/
   c[1][4] = c[1][4] - coeff*c[2][4];
   r[1]   = r[1]   - coeff*r[2];
 
-  coeff = llhs[3][2];
-  llhs[3][3]= llhs[3][3] - coeff*llhs[2][3];
-  llhs[3][4]= llhs[3][4] - coeff*llhs[2][4];
+  coeff = lhs[3][2];
+  lhs[3][3]= lhs[3][3] - coeff*lhs[2][3];
+  lhs[3][4]= lhs[3][4] - coeff*lhs[2][4];
   c[3][0] = c[3][0] - coeff*c[2][0];
   c[3][1] = c[3][1] - coeff*c[2][1];
   c[3][2] = c[3][2] - coeff*c[2][2];
@@ -3138,9 +3156,9 @@ c-------------------------------------------------------------------*/
   c[3][4] = c[3][4] - coeff*c[2][4];
   r[3]   = r[3]   - coeff*r[2];
 
-  coeff = llhs[4][2];
-  llhs[4][3]= llhs[4][3] - coeff*llhs[2][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[2][4];
+  coeff = lhs[4][2];
+  lhs[4][3]= lhs[4][3] - coeff*lhs[2][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[2][4];
   c[4][0] = c[4][0] - coeff*c[2][0];
   c[4][1] = c[4][1] - coeff*c[2][1];
   c[4][2] = c[4][2] - coeff*c[2][2];
@@ -3149,8 +3167,8 @@ c-------------------------------------------------------------------*/
   r[4]   = r[4]   - coeff*r[2];
 
 
-  pivot = 1.00/llhs[3][3];
-  llhs[3][4] = llhs[3][4]*pivot;
+  pivot = 1.00/lhs[3][3];
+  lhs[3][4] = lhs[3][4]*pivot;
   c[3][0] = c[3][0]*pivot;
   c[3][1] = c[3][1]*pivot;
   c[3][2] = c[3][2]*pivot;
@@ -3158,8 +3176,8 @@ c-------------------------------------------------------------------*/
   c[3][4] = c[3][4]*pivot;
   r[3]   = r[3]  *pivot;
 
-  coeff = llhs[0][3];
-  llhs[0][4]= llhs[0][4] - coeff*llhs[3][4];
+  coeff = lhs[0][3];
+  lhs[0][4]= lhs[0][4] - coeff*lhs[3][4];
   c[0][0] = c[0][0] - coeff*c[3][0];
   c[0][1] = c[0][1] - coeff*c[3][1];
   c[0][2] = c[0][2] - coeff*c[3][2];
@@ -3167,8 +3185,8 @@ c-------------------------------------------------------------------*/
   c[0][4] = c[0][4] - coeff*c[3][4];
   r[0]   = r[0]   - coeff*r[3];
 
-  coeff = llhs[1][3];
-  llhs[1][4]= llhs[1][4] - coeff*llhs[3][4];
+  coeff = lhs[1][3];
+  lhs[1][4]= lhs[1][4] - coeff*lhs[3][4];
   c[1][0] = c[1][0] - coeff*c[3][0];
   c[1][1] = c[1][1] - coeff*c[3][1];
   c[1][2] = c[1][2] - coeff*c[3][2];
@@ -3176,8 +3194,8 @@ c-------------------------------------------------------------------*/
   c[1][4] = c[1][4] - coeff*c[3][4];
   r[1]   = r[1]   - coeff*r[3];
 
-  coeff = llhs[2][3];
-  llhs[2][4]= llhs[2][4] - coeff*llhs[3][4];
+  coeff = lhs[2][3];
+  lhs[2][4]= lhs[2][4] - coeff*lhs[3][4];
   c[2][0] = c[2][0] - coeff*c[3][0];
   c[2][1] = c[2][1] - coeff*c[3][1];
   c[2][2] = c[2][2] - coeff*c[3][2];
@@ -3185,8 +3203,8 @@ c-------------------------------------------------------------------*/
   c[2][4] = c[2][4] - coeff*c[3][4];
   r[2]   = r[2]   - coeff*r[3];
 
-  coeff = llhs[4][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[3][4];
+  coeff = lhs[4][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[3][4];
   c[4][0] = c[4][0] - coeff*c[3][0];
   c[4][1] = c[4][1] - coeff*c[3][1];
   c[4][2] = c[4][2] - coeff*c[3][2];
@@ -3195,7 +3213,7 @@ c-------------------------------------------------------------------*/
   r[4]   = r[4]   - coeff*r[3];
 
 
-  pivot = 1.00/llhs[4][4];
+  pivot = 1.00/lhs[4][4];
   c[4][0] = c[4][0]*pivot;
   c[4][1] = c[4][1]*pivot;
   c[4][2] = c[4][2]*pivot;
@@ -3203,7 +3221,7 @@ c-------------------------------------------------------------------*/
   c[4][4] = c[4][4]*pivot;
   r[4]   = r[4]  *pivot;
 
-  coeff = llhs[0][4];
+  coeff = lhs[0][4];
   c[0][0] = c[0][0] - coeff*c[4][0];
   c[0][1] = c[0][1] - coeff*c[4][1];
   c[0][2] = c[0][2] - coeff*c[4][2];
@@ -3211,7 +3229,7 @@ c-------------------------------------------------------------------*/
   c[0][4] = c[0][4] - coeff*c[4][4];
   r[0]   = r[0]   - coeff*r[4];
 
-  coeff = llhs[1][4];
+  coeff = lhs[1][4];
   c[1][0] = c[1][0] - coeff*c[4][0];
   c[1][1] = c[1][1] - coeff*c[4][1];
   c[1][2] = c[1][2] - coeff*c[4][2];
@@ -3219,7 +3237,7 @@ c-------------------------------------------------------------------*/
   c[1][4] = c[1][4] - coeff*c[4][4];
   r[1]   = r[1]   - coeff*r[4];
 
-  coeff = llhs[2][4];
+  coeff = lhs[2][4];
   c[2][0] = c[2][0] - coeff*c[4][0];
   c[2][1] = c[2][1] - coeff*c[4][1];
   c[2][2] = c[2][2] - coeff*c[4][2];
@@ -3227,7 +3245,7 @@ c-------------------------------------------------------------------*/
   c[2][4] = c[2][4] - coeff*c[4][4];
   r[2]   = r[2]   - coeff*r[4];
 
-  coeff = llhs[3][4];
+  coeff = lhs[3][4];
   c[3][0] = c[3][0] - coeff*c[4][0];
   c[3][1] = c[3][1] - coeff*c[4][1];
   c[3][2] = c[3][2] - coeff*c[4][2];
@@ -3239,7 +3257,7 @@ c-------------------------------------------------------------------*/
 /*--------------------------------------------------------------------
 --------------------------------------------------------------------*/
 
-static void binvrhs( double llhs[5][5], double r[5] ) {
+static void binvrhs( double lhs[5][5], double r[5] ) {
 
 /*--------------------------------------------------------------------
 --------------------------------------------------------------------*/
@@ -3250,133 +3268,133 @@ static void binvrhs( double llhs[5][5], double r[5] ) {
 c     
 c-------------------------------------------------------------------*/
 
-  pivot = 1.00/llhs[0][0];
-  llhs[0][1] = llhs[0][1]*pivot;
-  llhs[0][2] = llhs[0][2]*pivot;
-  llhs[0][3] = llhs[0][3]*pivot;
-  llhs[0][4] = llhs[0][4]*pivot;
+  pivot = 1.00/lhs[0][0];
+  lhs[0][1] = lhs[0][1]*pivot;
+  lhs[0][2] = lhs[0][2]*pivot;
+  lhs[0][3] = lhs[0][3]*pivot;
+  lhs[0][4] = lhs[0][4]*pivot;
   r[0]   = r[0]  *pivot;
 
-  coeff = llhs[1][0];
-  llhs[1][1]= llhs[1][1] - coeff*llhs[0][1];
-  llhs[1][2]= llhs[1][2] - coeff*llhs[0][2];
-  llhs[1][3]= llhs[1][3] - coeff*llhs[0][3];
-  llhs[1][4]= llhs[1][4] - coeff*llhs[0][4];
+  coeff = lhs[1][0];
+  lhs[1][1]= lhs[1][1] - coeff*lhs[0][1];
+  lhs[1][2]= lhs[1][2] - coeff*lhs[0][2];
+  lhs[1][3]= lhs[1][3] - coeff*lhs[0][3];
+  lhs[1][4]= lhs[1][4] - coeff*lhs[0][4];
   r[1]   = r[1]   - coeff*r[0];
 
-  coeff = llhs[2][0];
-  llhs[2][1]= llhs[2][1] - coeff*llhs[0][1];
-  llhs[2][2]= llhs[2][2] - coeff*llhs[0][2];
-  llhs[2][3]= llhs[2][3] - coeff*llhs[0][3];
-  llhs[2][4]= llhs[2][4] - coeff*llhs[0][4];
+  coeff = lhs[2][0];
+  lhs[2][1]= lhs[2][1] - coeff*lhs[0][1];
+  lhs[2][2]= lhs[2][2] - coeff*lhs[0][2];
+  lhs[2][3]= lhs[2][3] - coeff*lhs[0][3];
+  lhs[2][4]= lhs[2][4] - coeff*lhs[0][4];
   r[2]   = r[2]   - coeff*r[0];
 
-  coeff = llhs[3][0];
-  llhs[3][1]= llhs[3][1] - coeff*llhs[0][1];
-  llhs[3][2]= llhs[3][2] - coeff*llhs[0][2];
-  llhs[3][3]= llhs[3][3] - coeff*llhs[0][3];
-  llhs[3][4]= llhs[3][4] - coeff*llhs[0][4];
+  coeff = lhs[3][0];
+  lhs[3][1]= lhs[3][1] - coeff*lhs[0][1];
+  lhs[3][2]= lhs[3][2] - coeff*lhs[0][2];
+  lhs[3][3]= lhs[3][3] - coeff*lhs[0][3];
+  lhs[3][4]= lhs[3][4] - coeff*lhs[0][4];
   r[3]   = r[3]   - coeff*r[0];
 
-  coeff = llhs[4][0];
-  llhs[4][1]= llhs[4][1] - coeff*llhs[0][1];
-  llhs[4][2]= llhs[4][2] - coeff*llhs[0][2];
-  llhs[4][3]= llhs[4][3] - coeff*llhs[0][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[0][4];
+  coeff = lhs[4][0];
+  lhs[4][1]= lhs[4][1] - coeff*lhs[0][1];
+  lhs[4][2]= lhs[4][2] - coeff*lhs[0][2];
+  lhs[4][3]= lhs[4][3] - coeff*lhs[0][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[0][4];
   r[4]   = r[4]   - coeff*r[0];
 
 
-  pivot = 1.00/llhs[1][1];
-  llhs[1][2] = llhs[1][2]*pivot;
-  llhs[1][3] = llhs[1][3]*pivot;
-  llhs[1][4] = llhs[1][4]*pivot;
+  pivot = 1.00/lhs[1][1];
+  lhs[1][2] = lhs[1][2]*pivot;
+  lhs[1][3] = lhs[1][3]*pivot;
+  lhs[1][4] = lhs[1][4]*pivot;
   r[1]   = r[1]  *pivot;
 
-  coeff = llhs[0][1];
-  llhs[0][2]= llhs[0][2] - coeff*llhs[1][2];
-  llhs[0][3]= llhs[0][3] - coeff*llhs[1][3];
-  llhs[0][4]= llhs[0][4] - coeff*llhs[1][4];
+  coeff = lhs[0][1];
+  lhs[0][2]= lhs[0][2] - coeff*lhs[1][2];
+  lhs[0][3]= lhs[0][3] - coeff*lhs[1][3];
+  lhs[0][4]= lhs[0][4] - coeff*lhs[1][4];
   r[0]   = r[0]   - coeff*r[1];
 
-  coeff = llhs[2][1];
-  llhs[2][2]= llhs[2][2] - coeff*llhs[1][2];
-  llhs[2][3]= llhs[2][3] - coeff*llhs[1][3];
-  llhs[2][4]= llhs[2][4] - coeff*llhs[1][4];
+  coeff = lhs[2][1];
+  lhs[2][2]= lhs[2][2] - coeff*lhs[1][2];
+  lhs[2][3]= lhs[2][3] - coeff*lhs[1][3];
+  lhs[2][4]= lhs[2][4] - coeff*lhs[1][4];
   r[2]   = r[2]   - coeff*r[1];
 
-  coeff = llhs[3][1];
-  llhs[3][2]= llhs[3][2] - coeff*llhs[1][2];
-  llhs[3][3]= llhs[3][3] - coeff*llhs[1][3];
-  llhs[3][4]= llhs[3][4] - coeff*llhs[1][4];
+  coeff = lhs[3][1];
+  lhs[3][2]= lhs[3][2] - coeff*lhs[1][2];
+  lhs[3][3]= lhs[3][3] - coeff*lhs[1][3];
+  lhs[3][4]= lhs[3][4] - coeff*lhs[1][4];
   r[3]   = r[3]   - coeff*r[1];
 
-  coeff = llhs[4][1];
-  llhs[4][2]= llhs[4][2] - coeff*llhs[1][2];
-  llhs[4][3]= llhs[4][3] - coeff*llhs[1][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[1][4];
+  coeff = lhs[4][1];
+  lhs[4][2]= lhs[4][2] - coeff*lhs[1][2];
+  lhs[4][3]= lhs[4][3] - coeff*lhs[1][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[1][4];
   r[4]   = r[4]   - coeff*r[1];
 
 
-  pivot = 1.00/llhs[2][2];
-  llhs[2][3] = llhs[2][3]*pivot;
-  llhs[2][4] = llhs[2][4]*pivot;
+  pivot = 1.00/lhs[2][2];
+  lhs[2][3] = lhs[2][3]*pivot;
+  lhs[2][4] = lhs[2][4]*pivot;
   r[2]   = r[2]  *pivot;
 
-  coeff = llhs[0][2];
-  llhs[0][3]= llhs[0][3] - coeff*llhs[2][3];
-  llhs[0][4]= llhs[0][4] - coeff*llhs[2][4];
+  coeff = lhs[0][2];
+  lhs[0][3]= lhs[0][3] - coeff*lhs[2][3];
+  lhs[0][4]= lhs[0][4] - coeff*lhs[2][4];
   r[0]   = r[0]   - coeff*r[2];
 
-  coeff = llhs[1][2];
-  llhs[1][3]= llhs[1][3] - coeff*llhs[2][3];
-  llhs[1][4]= llhs[1][4] - coeff*llhs[2][4];
+  coeff = lhs[1][2];
+  lhs[1][3]= lhs[1][3] - coeff*lhs[2][3];
+  lhs[1][4]= lhs[1][4] - coeff*lhs[2][4];
   r[1]   = r[1]   - coeff*r[2];
 
-  coeff = llhs[3][2];
-  llhs[3][3]= llhs[3][3] - coeff*llhs[2][3];
-  llhs[3][4]= llhs[3][4] - coeff*llhs[2][4];
+  coeff = lhs[3][2];
+  lhs[3][3]= lhs[3][3] - coeff*lhs[2][3];
+  lhs[3][4]= lhs[3][4] - coeff*lhs[2][4];
   r[3]   = r[3]   - coeff*r[2];
 
-  coeff = llhs[4][2];
-  llhs[4][3]= llhs[4][3] - coeff*llhs[2][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[2][4];
+  coeff = lhs[4][2];
+  lhs[4][3]= lhs[4][3] - coeff*lhs[2][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[2][4];
   r[4]   = r[4]   - coeff*r[2];
 
 
-  pivot = 1.00/llhs[3][3];
-  llhs[3][4] = llhs[3][4]*pivot;
+  pivot = 1.00/lhs[3][3];
+  lhs[3][4] = lhs[3][4]*pivot;
   r[3]   = r[3]  *pivot;
 
-  coeff = llhs[0][3];
-  llhs[0][4]= llhs[0][4] - coeff*llhs[3][4];
+  coeff = lhs[0][3];
+  lhs[0][4]= lhs[0][4] - coeff*lhs[3][4];
   r[0]   = r[0]   - coeff*r[3];
 
-  coeff = llhs[1][3];
-  llhs[1][4]= llhs[1][4] - coeff*llhs[3][4];
+  coeff = lhs[1][3];
+  lhs[1][4]= lhs[1][4] - coeff*lhs[3][4];
   r[1]   = r[1]   - coeff*r[3];
 
-  coeff = llhs[2][3];
-  llhs[2][4]= llhs[2][4] - coeff*llhs[3][4];
+  coeff = lhs[2][3];
+  lhs[2][4]= lhs[2][4] - coeff*lhs[3][4];
   r[2]   = r[2]   - coeff*r[3];
 
-  coeff = llhs[4][3];
-  llhs[4][4]= llhs[4][4] - coeff*llhs[3][4];
+  coeff = lhs[4][3];
+  lhs[4][4]= lhs[4][4] - coeff*lhs[3][4];
   r[4]   = r[4]   - coeff*r[3];
 
 
-  pivot = 1.00/llhs[4][4];
+  pivot = 1.00/lhs[4][4];
   r[4]   = r[4]  *pivot;
 
-  coeff = llhs[0][4];
+  coeff = lhs[0][4];
   r[0]   = r[0]   - coeff*r[4];
 
-  coeff = llhs[1][4];
+  coeff = lhs[1][4];
   r[1]   = r[1]   - coeff*r[4];
 
-  coeff = llhs[2][4];
+  coeff = lhs[2][4];
   r[2]   = r[2]   - coeff*r[4];
 
-  coeff = llhs[3][4];
+  coeff = lhs[3][4];
   r[3]   = r[3]   - coeff*r[4];
 
 }

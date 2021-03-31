@@ -288,6 +288,201 @@ static int launch_vmm_environment()
 
 extern struct naut_info * smp_ap_stack_switch(uint64_t, uint64_t, struct naut_info*);
 
+//#define NAS_EP_SP
+
+//#define NAS_CG_LU_MG
+
+//#define NAS_MG
+
+//#define NAS_BT
+
+//#define NAS_FT
+
+//#define NAS_IS
+
+//#define OMP128
+//#define OMP256
+
+char *scripts[] = {
+#ifdef NAS_EP_SP
+	"set-omp-num-threads 64",
+	"nas-ep", "nas-sp", 
+
+	"set-omp-num-threads 32",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 16",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 8",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 4",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 2",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 1",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 128",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 256",
+	"nas-ep", "nas-sp",
+#endif
+
+#ifdef NAS_CG_LU_MG
+	"set-omp-num-threads 64",
+	"nas-cg", "nas-lu", "nas-mg", 
+
+	"set-omp-num-threads 32",
+	"nas-cg", "nas-lu", "nas-mg", 
+
+	"set-omp-num-threads 16",
+	"nas-cg", "nas-lu", "nas-mg", 
+
+	"set-omp-num-threads 8",
+	"nas-cg", "nas-lu", "nas-mg",
+
+	"set-omp-num-threads 4",
+	"nas-cg", "nas-lu", "nas-mg",
+
+	"set-omp-num-threads 2",
+	"nas-cg", "nas-lu", "nas-mg",
+
+	"set-omp-num-threads 1",
+	"nas-cg", "nas-lu", "nas-mg",
+	
+	"set-omp-num-threads 128",
+	"nas-cg", "nas-lu", "nas-mg",
+
+	"set-omp-num-threads 256",
+	"nas-cg", "nas-lu", "nas-mg",
+#endif
+
+#ifdef NAS_BT
+	"set-omp-num-threads 64",
+	"nas-bt",
+
+	"set-omp-num-threads 32",
+	"nas-bt",
+
+	"set-omp-num-threads 16",
+	"nas-bt",
+
+	"set-omp-num-threads 8",
+	"nas-bt",
+
+	"set-omp-num-threads 4",
+	"nas-bt",
+
+	"set-omp-num-threads 2",
+	"nas-bt",
+
+	"set-omp-num-threads 1",
+	"nas-bt",
+
+	"set-omp-num-threads 128",
+	"nas-bt",
+
+	"set-omp-num-threads 256",
+	"nas-bt",
+	
+#endif
+
+#ifdef NAS_FT
+
+	"set-omp-num-threads 64",
+	"nas-ft",
+
+	"set-omp-num-threads 32",
+	"nas-ft",
+
+	"set-omp-num-threads 16",
+	"nas-ft",
+
+	"set-omp-num-threads 8",
+	"nas-ft",
+
+	"set-omp-num-threads 4",
+	"nas-ft",
+
+	"set-omp-num-threads 2",
+	"nas-ft",
+
+	"set-omp-num-threads 1",
+	"nas-ft",
+
+	"set-omp-num-threads 128",
+	"nas-ft",
+
+	"set-omp-num-threads 256",
+	"nas-ft",
+
+#endif
+#ifdef NAS_MG
+	"set-omp-num-threads 64",
+	"nas-mg",
+
+	"set-omp-num-threads 32",
+	"nas-mg",
+
+	"set-omp-num-threads 16",
+	"nas-mg",
+
+	"set-omp-num-threads 8",
+	"nas-mg",
+
+	"set-omp-num-threads 4",
+	"nas-mg",
+
+	"set-omp-num-threads 2",
+	"nas-mg",
+
+	"set-omp-num-threads 1",
+	"nas-mg",
+#endif
+
+#ifdef NAS_MG_250
+	"set-omp-num-threads 128",
+	"nas-mg",
+
+	"set-omp-num-threads 256",
+	"nas-mg",
+#endif
+
+#ifdef NAS_IS
+	"set-omp-num-threads 64",
+	"nas-is",
+
+	"set-omp-num-threads 32",
+	"nas-is",
+
+	"set-omp-num-threads 16",
+	"nas-is",
+
+	"set-omp-num-threads 8",
+	"nas-is",
+
+	"set-omp-num-threads 4",
+	"nas-is",
+
+	"set-omp-num-threads 2",
+	"nas-is",
+
+	"set-omp-num-threads 1",
+	"nas-is",
+
+	"set-omp-num-threads 128",
+	"nas-is",
+	
+	"set-omp-num-threads 256",
+	"nas-is",
+#endif
+
+	 0};
 void
 init (unsigned long mbd,
       unsigned long magic)
@@ -574,7 +769,7 @@ init (unsigned long mbd,
 #endif
     
     nk_launch_shell("root-shell",0,0,0);
-
+    //nk_launch_shell("root-shell",0,scripts,0);	
     runtime_init();
 
 

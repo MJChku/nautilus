@@ -452,6 +452,7 @@ nk_thread_start (nk_thread_fun_t fun,
     THREAD_DEBUG("Start thread, caller %p\n", __builtin_return_address(0));
 
     if (nk_thread_create(fun, input, output, is_detached, stack_size, &newtid, bound_cpu) < 0) {
+   // if (nk_thread_create(fun, input, output, is_detached, 1<<27UL, &newtid, bound_cpu) < 0) {
         THREAD_ERROR("Could not create thread\n");
         return -1;
     }

@@ -70,10 +70,10 @@ if ((parms = (thread_parms *) malloc (sizeof (*parms))) == NULL)
     }
   
 
-  struct sys_info *sys = per_cpu_get(system);
-  int cpu_num = (++COUNT)% sys->num_cpus;
+//  struct sys_info *sys = per_cpu_get(system);
+//  int cpu_num = (++COUNT)% sys->num_cpus;
   
-  int ret = nk_thread_start((void*)(&pte_thread_start), parms, NULL, 0, (nk_stack_size_t)stack_size, ptid, cpu_num);
+  int ret = nk_thread_start((void*)(&pte_thread_start), parms, NULL, 0, (nk_stack_size_t)stack_size, ptid, -1);
   if (ret != 0){
     ERROR("create error exit\n");
     osResult = PTE_OS_NO_RESOURCES;

@@ -34,50 +34,60 @@
 
 enum vga_color
 {
-    COLOR_BLACK = 0,
-    COLOR_BLUE = 1,
-    COLOR_GREEN = 2,
-    COLOR_CYAN = 3,
-    COLOR_RED = 4,
-    COLOR_MAGENTA = 5,
-    COLOR_BROWN = 6,
-    COLOR_LIGHT_GREY = 7,
-    COLOR_DARK_GREY = 8,
-    COLOR_LIGHT_BLUE = 9,
-    COLOR_LIGHT_GREEN = 10,
-    COLOR_LIGHT_CYAN = 11,
-    COLOR_LIGHT_RED = 12,
+    COLOR_BLACK         = 0,
+    COLOR_BLUE          = 1,
+    COLOR_GREEN         = 2,
+    COLOR_CYAN          = 3,
+    COLOR_RED           = 4,
+    COLOR_MAGENTA       = 5,
+    COLOR_BROWN         = 6,
+    COLOR_LIGHT_GREY    = 7,
+    COLOR_DARK_GREY     = 8,
+    COLOR_LIGHT_BLUE    = 9,
+    COLOR_LIGHT_GREEN   = 10,
+    COLOR_LIGHT_CYAN    = 11,
+    COLOR_LIGHT_RED     = 12,
     COLOR_LIGHT_MAGENTA = 13,
-    COLOR_LIGHT_BROWN = 14,
-    COLOR_WHITE = 15,
+    COLOR_LIGHT_BROWN   = 14,
+    COLOR_WHITE         = 15,
 };
 
-uint16_t vga_make_entry (char c, uint8_t attr);
-uint8_t  vga_make_color (enum vga_color fg, enum vga_color bg);
-void     vga_set_cursor(uint8_t x, uint8_t y);
+uint16_t vga_make_entry(char c, uint8_t attr);
+uint8_t  vga_make_color(enum vga_color fg, enum vga_color bg);
+void     vga_set_cursor(size_t x, size_t y);
 void     vga_get_cursor(uint8_t *x, uint8_t *y);
 
+struct multiboot_info;
 void     vga_early_init();
-void     vga_init();
+void     vga_init(struct multiboot_info * mb);
 
 void     vga_init_screen();
 
+void vga_write_screen(size_t x, size_t y, uint16_t val);
+/*
 static inline void vga_write_screen(uint8_t x, uint8_t y, uint16_t val)
 {
     uint16_t *addr = ((uint16_t *)VGA_BASE_ADDR)+y*VGA_WIDTH+x;
     __asm__ __volatile__ (" movw %0, (%1) " : : "r"(val),"r"(addr) : );
 }
+*/
 
+void vga_clear_screen(uint16_t val);
+/*
 static inline void vga_clear_screen(uint16_t val)
 {
   nk_low_level_memset_word((void*)VGA_BASE_ADDR,val,VGA_WIDTH*VGA_HEIGHT);
 }
+*/
 
 void vga_scrollup(void);
 void vga_putchar(char c);
 void vga_print(char *buf);
 void vga_puts(char *buf);
 
+void vga_copy_out(void *dst, uint32_t n);
+void vga_copy_in(void *src, uint32_t n);
+/*
 static inline void vga_copy_out(void *dest, uint32_t n)
 {
   nk_low_level_memcpy((void *)dest,(void*)VGA_BASE_ADDR,n);
@@ -87,6 +97,7 @@ static inline void vga_copy_in(void *src, uint32_t n)
 {
   nk_low_level_memcpy((void*)VGA_BASE_ADDR, src, n);
 }
+*/
 
 
 

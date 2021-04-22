@@ -36,6 +36,7 @@ ulong_t multiboot_get_sys_ram(ulong_t mbd);
 struct multiboot_info * multiboot_parse(ulong_t mbd, ulong_t magic);
 int mb_is_hrt_environ (ulong_t mbd);
 void* mb_get_first_hrt_addr (ulong_t mbd);
+void* mb_get_rsdp(void);
 
 typedef enum {
     MOD_SYMTAB,
@@ -57,6 +58,9 @@ struct multiboot_info {
     struct multiboot_tag_hrt * hrt_info;
     int mod_count;
     struct list_head mod_list;
+    void * acpi_1dot0_rsdp;
+    void * acpi_2dot0_rsdp;
+    struct multiboot_tag_framebuffer fb_info;
 };
 
 

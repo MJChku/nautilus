@@ -533,6 +533,11 @@ static void* nk_thread_set_tls(int placement_cpu)
 {
   //mjc
     void * tls_loc;
+    //hack to print _bss end
+    extern addr_t _bssEnd;
+
+    addr_t bssend = (addr_t) &_bssEnd;
+    nk_vc_printf("address _bssEnd at %p\n",bssend);
     extern addr_t _tbss_end, _tdata_start,_tdata_end;
     addr_t tdata_start = (addr_t) &_tdata_start;
     addr_t tdata_end = (addr_t) &_tdata_end;

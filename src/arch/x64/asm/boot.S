@@ -37,10 +37,11 @@ multiboot_hdr:
     .long -(0xe85250d6 + 0 + (hdr_end - multiboot_hdr))
 
     /* BEGIN TAGS */
+    /* note that each tag must be aligned to an 8-byte address */
 
-    /* sections */
- 
-    .word 2, 0
+    /* address tag */
+    .word 2
+    .word 0
     .long 24
     .long multiboot_hdr
     .long _loadStart
@@ -48,13 +49,33 @@ multiboot_hdr:
     .long _bssEnd
 
     /* entry point */
-    .word 3, 0
+    .word 3
+    .word 0
     .long 16
     .long nautilus_entry
-    .long 0
+
+    .long 0 /* pad */
+
+    /* flags */
+    .word 4
+    .word 0
+    .long 16
+    .long 0x00000002
+
+    .long 0 /* pad */
+
+    /* framebuffer */
+    .word 5, 0
+    .long 24
+    .long 1024
+    .long 768
+    .long 32
+
+    .long 0 /* pad */
 
     /* tags end */
-    .word 0, 0
+    .word 0
+    .word 0
     .long 8
 hdr_end:
 
@@ -123,9 +144,9 @@ paging_longmode_setup:
     orl $0x3, %eax
     movl $pdpt, %ebx
     movl %eax, (%ebx)
-   
-    //set first 4 entry of PDPT 4GB total
-    movl $2, %ecx
+
+    //set first 2 entry of PDPT 1GB total
+    movl $1, %ecx
     movl $pd, %edx
     movl $0x83, %eax // set PS bit also (PDE -> 2MB page)
 
@@ -134,20 +155,21 @@ paging_longmode_setup:
 
     // Identity map the first GB
     movl $512, %ecx
+//    movl $pd, %edx
+//    movl $0x83, %eax // set PS bit also (PDE -> 2MB page)
 .write_pde:
     movl %eax, (%edx)
     addl $0x200000, %eax
     addl $0x8, %edx
-    loop .write_pde 
-    
+    loop .write_pde
+
     push %edx
     orl $0x3, %edx
     addl $0x8, %ebx  //next entry of pdpt
-    movl %edx, (%ebx) 
+    movl %edx, (%ebx)
     pop %edx
     pop %ecx
     loop .write_pdpe
-
 
     /* put pml4 address in cr3 */
     movl $pml4, %eax

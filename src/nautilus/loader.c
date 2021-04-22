@@ -211,7 +211,8 @@ static int
 parse_multiboot_header (void *data, uint64_t size, mb_data_t *mb)
 {
     uint64_t i;
-    
+   
+   DEBUG("parse multiboot header\n"); 
     mb_header_t *mb_header=0;
     mb_tag_t *mb_tag=0;
     mb_info_t *mb_inf=0;

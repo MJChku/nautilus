@@ -333,6 +333,10 @@ acpi_parse_lapic (struct acpi_subtable_header * hdr,
 	}
 	memset(new_cpu, 0, sizeof(struct cpu));
 
+    // note that ACPI entries are supposed *not* to put
+    // co-resident adjacent in the ID namespace, thus setting
+    // the logical ID of the CPU based on order found in the
+    // MADT is a good idea (and indeed this is what the spec says to do)
 	new_cpu->id         = sys->num_cpus;
 	new_cpu->lapic_id   = p->id;
 	new_cpu->enabled    = 1;
@@ -386,7 +390,8 @@ static int acpi_parse_local_x2apic (struct acpi_subtable_header * hdr,
     new_cpu->feat_flags = 0;
     new_cpu->system     = sys;
     new_cpu->cpu_khz    = nk_detect_cpu_freq(new_cpu->id);
-    new_cpu->is_bsp     = 0; // id > 255 by design
+    //new_cpu->is_bsp     = 0; // id > 255 by design
+    new_cpu->is_bsp     = (new_cpu->id == 0) ? 1 : 0;
 
     spinlock_init(&new_cpu->lock);
     
@@ -574,9 +579,10 @@ __early_init_madt (struct naut_info * naut)
     }
 
     // The ACPI model is that all APICs, *whether XAPIC or X2APIC*
-    // whose id is <256 ar reported ONLY as lapics.  Those whose ids
-    // are 256+ are X2APICS, so we need to now add whatever
+    // whose id is <255 ar reported ONLY as lapics.  Those whose ids
+    // are >255 are X2APICS, so we need to now add whatever
     // X2APICs and their processors we can find
+    // KCH: not all machines adhere to this model unfortunately...
     if (acpi_table_parse_madt(ACPI_MADT_TYPE_LOCAL_X2APIC,
 			      acpi_parse_local_x2apic,
 			      NAUT_CONFIG_MAX_CPUS)) {

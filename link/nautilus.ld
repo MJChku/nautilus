@@ -136,6 +136,14 @@ SECTIONS
     _bssEnd = .;
    
     _data_end = .;
+
+    . = 0x100000000;
+    . = ALIGN(4096);
+
+    .nasbss ALIGN(0x1000) : AT(ADDR(.bss)+SIZEOF(.bss))
+    {
+        *(.nasbss*)
+    }
    
     
     /DISCARD/ :

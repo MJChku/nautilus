@@ -303,127 +303,129 @@ extern struct naut_info * smp_ap_stack_switch(uint64_t, uint64_t, struct naut_in
 //#define OMP128
 //#define OMP256
 
+#define NAS_CG_LU_MG
+
 char *scripts[] = {
 #ifdef NAS_EP_SP
-	"set-omp-num-threads 64",
+	"set-omp-num-threads 384",
 	"nas-ep", "nas-sp", 
 
-	"set-omp-num-threads 32",
+	"set-omp-num-threads 192",
 	"nas-ep", "nas-sp",
 
-	"set-omp-num-threads 16",
+	"set-omp-num-threads 96",
 	"nas-ep", "nas-sp",
 
-	"set-omp-num-threads 8",
+	"set-omp-num-threads 48",
 	"nas-ep", "nas-sp",
 
-	"set-omp-num-threads 4",
+	"set-omp-num-threads 24",
 	"nas-ep", "nas-sp",
 
-	"set-omp-num-threads 2",
+	"set-omp-num-threads 12",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 6",
+	"nas-ep", "nas-sp",
+
+	"set-omp-num-threads 3",
 	"nas-ep", "nas-sp",
 
 	"set-omp-num-threads 1",
-	"nas-ep", "nas-sp",
-
-	"set-omp-num-threads 128",
-	"nas-ep", "nas-sp",
-
-	"set-omp-num-threads 256",
 	"nas-ep", "nas-sp",
 #endif
 
 #ifdef NAS_CG_LU_MG
-	"set-omp-num-threads 64",
+	"set-omp-num-threads 384",
 	"nas-cg", "nas-lu", "nas-mg", 
 
-	"set-omp-num-threads 32",
+	"set-omp-num-threads 192",
 	"nas-cg", "nas-lu", "nas-mg", 
 
-	"set-omp-num-threads 16",
+	"set-omp-num-threads 96",
 	"nas-cg", "nas-lu", "nas-mg", 
 
-	"set-omp-num-threads 8",
+	"set-omp-num-threads 48",
 	"nas-cg", "nas-lu", "nas-mg",
 
-	"set-omp-num-threads 4",
+	"set-omp-num-threads 24",
 	"nas-cg", "nas-lu", "nas-mg",
 
-	"set-omp-num-threads 2",
+	"set-omp-num-threads 12",
+	"nas-cg", "nas-lu", "nas-mg",
+
+	"set-omp-num-threads 6",
+	"nas-cg", "nas-lu", "nas-mg",
+	
+	"set-omp-num-threads 3",
 	"nas-cg", "nas-lu", "nas-mg",
 
 	"set-omp-num-threads 1",
-	"nas-cg", "nas-lu", "nas-mg",
-	
-	"set-omp-num-threads 128",
-	"nas-cg", "nas-lu", "nas-mg",
-
-	"set-omp-num-threads 256",
 	"nas-cg", "nas-lu", "nas-mg",
 #endif
 
 #ifdef NAS_BT
-	"set-omp-num-threads 64",
+	"set-omp-num-threads 384",
 	"nas-bt",
 
-	"set-omp-num-threads 32",
+	"set-omp-num-threads 192",
 	"nas-bt",
 
-	"set-omp-num-threads 16",
+	"set-omp-num-threads 96",
 	"nas-bt",
 
-	"set-omp-num-threads 8",
+	"set-omp-num-threads 48",
 	"nas-bt",
 
-	"set-omp-num-threads 4",
+	"set-omp-num-threads 24",
 	"nas-bt",
 
-	"set-omp-num-threads 2",
+	"set-omp-num-threads 12",
+	"nas-bt",
+
+	"set-omp-num-threads 6",
+	"nas-bt",
+
+	"set-omp-num-threads 3",
 	"nas-bt",
 
 	"set-omp-num-threads 1",
-	"nas-bt",
-
-	"set-omp-num-threads 128",
-	"nas-bt",
-
-	"set-omp-num-threads 256",
 	"nas-bt",
 	
 #endif
 
 #ifdef NAS_FT
 
-	"set-omp-num-threads 64",
+	"set-omp-num-threads 384",
 	"nas-ft",
 
-	"set-omp-num-threads 32",
+	"set-omp-num-threads 192",
 	"nas-ft",
 
-	"set-omp-num-threads 16",
+	"set-omp-num-threads 96",
 	"nas-ft",
 
-	"set-omp-num-threads 8",
+	"set-omp-num-threads 48",
 	"nas-ft",
 
-	"set-omp-num-threads 4",
+	"set-omp-num-threads 24",
 	"nas-ft",
 
-	"set-omp-num-threads 2",
+	"set-omp-num-threads 12",
+	"nas-ft",
+
+	"set-omp-num-threads 6",
+	"nas-ft",
+
+	"set-omp-num-threads 3",
 	"nas-ft",
 
 	"set-omp-num-threads 1",
 	"nas-ft",
 
-	"set-omp-num-threads 128",
-	"nas-ft",
-
-	"set-omp-num-threads 256",
-	"nas-ft",
-
 #endif
 #ifdef NAS_MG
-	"set-omp-num-threads 64",
+	"set-omp-num-threads 384",
 	"nas-mg",
 
 	"set-omp-num-threads 32",
@@ -625,11 +627,11 @@ init (unsigned long mbd,
     nk_thread_group_init();
     nk_group_sched_init();
 
+
     /* we now switch away from the boot-time stack in low memory */
     naut = smp_ap_stack_switch(get_cur_thread()->rsp, get_cur_thread()->rsp, naut);
 
     mm_boot_kmem_cleanup();
-
 
     smp_setup_xcall_bsp(naut->sys.cpus[0]);
 
@@ -668,7 +670,7 @@ init (unsigned long mbd,
 
     // reinit the early-initted devices now that
     // we have malloc and the device framework functional
-    vga_init();
+    vga_init(naut->sys.mb_info);
     serial_init();
 
     nk_sched_start();
@@ -769,7 +771,7 @@ init (unsigned long mbd,
 #endif
     
     nk_launch_shell("root-shell",0,0,0);
-    //nk_launch_shell("root-shell",0,scripts,0);	
+//    nk_launch_shell("root-shell",0,scripts,0);	
     runtime_init();
 
 

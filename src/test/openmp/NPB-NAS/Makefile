@@ -5,8 +5,8 @@ obj-y += math/
 obj-y += common/\
 	rand/
 #EP and MG conflicts with others
-
-obj-y += \
+obj-y += LU/
+#obj-y += \
 	 SP/\
 	 LU/\
 	 IS/\

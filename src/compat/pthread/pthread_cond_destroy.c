@@ -19,8 +19,9 @@ pthread_cond_destroy (pthread_cond_t * c)
         NK_UNLOCK(&c->lock);
         return EINVAL;
     }
+    nk_wait_queue_destroy(c->wait_queue);
 
-    ssem_destroy(c->sem);
+   // ssem_destroy(c->sem);
     NK_UNLOCK(&c->lock);
     memset(c, 0, sizeof(pthread_cond_t));
     return 0;

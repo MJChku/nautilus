@@ -261,8 +261,8 @@ struct ThreadParms
 struct nk_pthread_cond_t_
 {
     NK_LOCK_T lock;
-    simple_sem_t* sem; 
-    //nk_wait_queue_t * wait_queue;
+    //simple_sem_t* sem; 
+    nk_wait_queue_t * wait_queue;
     unsigned nwaiters;
     unsigned long long wakeup_seq;
     unsigned long long woken_seq;

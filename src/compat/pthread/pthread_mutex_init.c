@@ -81,8 +81,8 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
       //DEBUG("pass mxkind\n");
       mx->ownerThread = NULL;
       mx->sem = malloc(sizeof(simple_sem_t));
-      //mx->sem = nk_semaphore_create(NULL, 0,0, NULL);
-      ssem_init(mx->sem,  0);
+      mx->sem = nk_semaphore_create(NULL, 0,0, NULL);
+      //ssem_init(mx->sem,  0);
       //pte_osSemaphoreCreate(0,&mx->handle);
 
     }

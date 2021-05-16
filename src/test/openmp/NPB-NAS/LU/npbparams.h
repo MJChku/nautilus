@@ -6,13 +6,13 @@ c  in this directory. Do not modify it by hand.
 */
 
 /* full problem size */
-#define	ISIZ1	102
-#define	ISIZ2	102
-#define	ISIZ3	102
+#define	ISIZ1	12
+#define	ISIZ2	12
+#define	ISIZ3	12
 /* number of iterations and how often to print the norm */
-#define	ITMAX_DEFAULT	250
-#define	INORM_DEFAULT	250
-#define	DT_DEFAULT	2.0
+#define	ITMAX_DEFAULT	50
+#define	INORM_DEFAULT	50
+#define	DT_DEFAULT	0.5
 #define	CONVERTDOUBLE	FALSE
 #define COMPILETIME "25 Sep 2020"
 #define NPBVERSION "3.0 structured"

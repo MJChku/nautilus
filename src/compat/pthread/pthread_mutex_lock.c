@@ -89,8 +89,8 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
           while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
             {
 	     
-	      //nk_semaphore_down(mx->sem);
-	      ssem_wait(mx->sem);
+	      nk_semaphore_down(mx->sem);
+	      //ssem_wait(mx->sem);
             }
         }
     }
@@ -120,8 +120,8 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
             {
               while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
                 {
-                   //nk_semaphore_down(mx->sem);
-		   ssem_wait(mx->sem);
+                   nk_semaphore_down(mx->sem);
+		   //ssem_wait(mx->sem);
 		}
 
               if (0 == result)

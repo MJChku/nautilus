@@ -86,8 +86,8 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
                   /*
                    * Someone may be waiting on that mutex.
                    */
-	          //nk_semaphore_up(mx->sem);
-		  ssem_post(mx->sem,1);
+	          nk_semaphore_up(mx->sem);
+		  //ssem_post(mx->sem,1);
                 }
             }
           else
@@ -109,8 +109,8 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 
                   if (PTE_ATOMIC_EXCHANGE (&mx->lock_idx,0) < 0)
                     {
-                       //nk_semaphore_up(mx->sem);
-		       ssem_post(mx->sem,1);
+                       nk_semaphore_up(mx->sem);
+		       //ssem_post(mx->sem,1);
                     }
                 }
             }

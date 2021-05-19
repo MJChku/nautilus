@@ -264,8 +264,8 @@ void nk_wait_queue_sleep(nk_wait_queue_t *q);
 void nk_wait_queue_sleep_extended(nk_wait_queue_t * q, int (*cond_check)(void *state), void *state);
 void nk_wait_queue_sleep_extended_multiple(int num, nk_wait_queue_t **q, int (**cond_check)(void *state), void **state);
 
-void nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock);
-void nk_wait_queue_wake_all_extended(nk_wait_queue_t * q, int havelock);
+int nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock);
+int nk_wait_queue_wake_all_extended(nk_wait_queue_t * q, int havelock);
 
 #define nk_wait_queue_enqueue(q,t) nk_wait_queue_enqueue_extended(q,t,0)
 #define nk_wait_queue_dequeue(q) nk_wait_queue_dequeue_extended(q,0)

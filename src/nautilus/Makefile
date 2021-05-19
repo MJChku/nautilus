@@ -1,4 +1,6 @@
 obj-y += \
+	futex.o\
+	mutex.o\
 	fmtout.o \
 	printk.o \
 	doprnt.o \

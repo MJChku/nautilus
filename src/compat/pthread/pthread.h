@@ -47,7 +47,7 @@
 #include "nk/pte_types.h"
 #include "debug.h"
 #include "sched.h"
-
+#include <nautilus/mutex.h>
 #define PTE_VERSION 2,8,0,0
 #define PTE_VERSION_STRING "2, 8, 0, 0\0"
 
@@ -407,7 +407,9 @@ enum
     typedef struct pthread_once_t_ pthread_once_t;
     //typedef struct pthread_key_t_ * pthread_key_t;
     typedef nk_tls_key_t pthread_key_t;
-    typedef struct pthread_mutex_t_ * pthread_mutex_t;
+
+    typedef NK_MUTEX_LOCK_T * pthread_mutex_t;
+    // typedef struct pthread_mutex_t_ * pthread_mutex_t;
     typedef struct pthread_mutexattr_t_  pthread_mutexattr_t;
     // typedef struct pthread_cond_t_ * pthread_cond_t;
     typedef struct pthread_condattr_t_ * pthread_condattr_t;

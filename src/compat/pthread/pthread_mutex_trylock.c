@@ -51,6 +51,8 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
   int result = 0;
   pthread_mutex_t mx;
 
+
+  return NK_MUTEX_TRY_LOCK(*mutex);
   /*
    * Let the system deal with invalid pointers.
    */
@@ -61,6 +63,8 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
    * again inside the guarded section of pte_mutex_check_need_init()
    * to avoid race conditions.
    */
+
+  /*
   if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       if ((result = pte_mutex_check_need_init (mutex)) != 0)
@@ -91,6 +95,8 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
           result = EBUSY;
         }
     }
+
   NK_PROFILE_EXIT();
   return (result);
-}
+*/}
+

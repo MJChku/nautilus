@@ -105,7 +105,6 @@ spin_unlock_irq_restore (volatile spinlock_t * lock, uint8_t flags)
 }
 
 
-
 #ifdef NAUT_CONFIG_USE_TICKETLOCKS
 #include <nautilus/ticketlock.h>
 // this expects the struct, not the pointer to it

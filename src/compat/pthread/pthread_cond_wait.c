@@ -25,7 +25,8 @@ int
 pthread_cond_timedwait (pthread_cond_t * c,
                     pthread_mutex_t * l, const struct timespec *abstime)
 {
-   
+    
+    return EINVAL;
     NK_PROFILE_ENTRY();
     int result = 0;
     if (c == NULL || abstime == NULL){
@@ -61,7 +62,7 @@ pthread_cond_timedwait (pthread_cond_t * c,
         
         NK_UNLOCK(&c->lock); 
        
-	ssem_timedwait(c->sem, timeout_ns-(now-start));
+	//ssem_timedwait(c->sem, timeout_ns-(now-start));
  
         NK_LOCK(&c->lock);
 	
@@ -119,8 +120,9 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
         NK_UNLOCK(&c->lock);
 	
     DEBUG("Condvar before ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
-	ssem_wait(c->sem);
-        
+//	ssem_wait(c->sem);
+    nk_wait_queue_sleep(c->wait_queue);
+      
     DEBUG("Condvar after ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 	NK_LOCK(&c->lock);
 

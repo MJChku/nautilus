@@ -111,6 +111,10 @@ int
 pthread_mutex_timedlock (pthread_mutex_t * mutex,
                          const struct timespec *abstime)
 {
+
+  ERROR("timed lock mutex not expected\n");
+  return 1;
+
   NK_PROFILE_ENTRY();
   int result;
   pthread_mutex_t mx;
@@ -128,7 +132,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
    * again inside the guarded section of pte_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
+/*  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       if ((result = pte_mutex_check_need_init (mutex)) != 0)
         {
@@ -200,4 +204,5 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
     }
   NK_PROFILE_EXIT();
   return 0;
-}
+*/}
+

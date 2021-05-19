@@ -306,10 +306,11 @@ void nk_wait_queue_sleep(nk_wait_queue_t *wq)
 }
 
 
-void nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock)
+int nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock)
 {
     nk_thread_t * t = 0;
     uint8_t flags=0;
+		int awoken_threads = 0;
     
     // avoid any output in this function since it can be called by even low-level serial output
 
@@ -321,7 +322,7 @@ void nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock)
     }
 
     if (!havelock) {
-	flags = spin_lock_irq_save(&q->lock);
+	    flags = spin_lock_irq_save(&q->lock);
     }
 
     t = nk_wait_queue_dequeue_extended(q, 1);
@@ -336,16 +337,18 @@ void nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock)
     // already made the thread schedulable
 
     if (__sync_bool_compare_and_swap(&t->status, NK_THR_WAITING, NK_THR_SUSPENDED)) {
-	// if we switched it from waiting to suspended, we are responsible for getting
-	// the scheduler involved
-	if (nk_sched_awaken(t, t->current_cpu)) { 
-	    WQ_ERROR("Failed to awaken thread\n");
-	    goto out;
-	}
+			// if we switched it from waiting to suspended, we are responsible for getting
+			// the scheduler involved
+			if (nk_sched_awaken(t, t->current_cpu)) { 
+					WQ_ERROR("Failed to awaken thread\n");
+					goto out;
+			}
 
-	nk_sched_kick_cpu(t->current_cpu);
+			awoken_threads += 1;
 
-	//WQ_DEBUG("Thread queue wake one (q=%p) woke up thread %lu (%s)\n", (void*)q, t->tid, t->name);
+			nk_sched_kick_cpu(t->current_cpu);
+
+			//WQ_DEBUG("Thread queue wake one (q=%p) woke up thread %lu (%s)\n", (void*)q, t->tid, t->name);
 
     } else {
 
@@ -354,17 +357,18 @@ void nk_wait_queue_wake_one_extended(nk_wait_queue_t * q, int havelock)
 
  out:
     if (!havelock) {
-	spin_unlock_irq_restore(&q->lock,flags);
+	      spin_unlock_irq_restore(&q->lock,flags);
     }
-
+		return awoken_threads;
 }
 
 
 
-void nk_wait_queue_wake_all_extended(nk_wait_queue_t * q, int havelock)
+int nk_wait_queue_wake_all_extended(nk_wait_queue_t * q, int havelock)
 {
     nk_thread_t * t = 0;
     uint8_t flags=0;
+		int awoken_threads = 0;
 
     // avoid any output in this function since it can be called by even low-level serial output
 
@@ -375,33 +379,36 @@ void nk_wait_queue_wake_all_extended(nk_wait_queue_t * q, int havelock)
     }
 
     if (!havelock) {
-	flags = spin_lock_irq_save(&q->lock);
+			flags = spin_lock_irq_save(&q->lock);
     }
 
     while ((t = nk_wait_queue_dequeue_extended(q,1))) {
 
-	if (__sync_bool_compare_and_swap(&t->status, NK_THR_WAITING, NK_THR_SUSPENDED)) {
-	    // if we switched it from waiting to suspended, we are responsible for getting
-	    // the scheduler involved
-	    if (nk_sched_awaken(t, t->current_cpu)) { 
-		WQ_ERROR("Failed to awaken thread\n");
-		goto out;
-	    }
-	    
-	    nk_sched_kick_cpu(t->current_cpu);
+			if (__sync_bool_compare_and_swap(&t->status, NK_THR_WAITING, NK_THR_SUSPENDED)) {
+				// if we switched it from waiting to suspended, we are responsible for getting
+				// the scheduler involved
+				if (nk_sched_awaken(t, t->current_cpu)) { 
+					WQ_ERROR("Failed to awaken thread\n");
+					goto out;
+				}
 
-	    //WQ_DEBUG("Waking all waiters on wait queue %s woke thread %lu (%s)\n", q->name,t->tid,t->name);
+				awoken_threads += 1;
+				
+				nk_sched_kick_cpu(t->current_cpu);
+
+				//WQ_DEBUG("Waking all waiters on wait queue %s woke thread %lu (%s)\n", q->name,t->tid,t->name);
 	    
-	} else {
+			} else {
 
 	    //WQ_DEBUG("Waking all waiters on wait %s found that thread %lu (%s) was already awake\n", q->name, t->tid, t->name);
-	}
+			}
     }
 
  out:
     if (!havelock) {
-	spin_unlock_irq_restore(&q->lock, flags);
+			spin_unlock_irq_restore(&q->lock, flags);
     }
+		return awoken_threads;
 }
 
 

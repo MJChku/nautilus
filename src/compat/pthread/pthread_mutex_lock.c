@@ -51,8 +51,6 @@ int
 pthread_mutex_lock (pthread_mutex_t * mutex)
 {
   NK_PROFILE_ENTRY();
-  int result = 0;
-  pthread_mutex_t mx;
 
   /*
    * Let the system deal with invalid pointers.
@@ -62,13 +60,17 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
       return EINVAL;
     }
 
+   NK_MUTEX_LOCK(*mutex);
+   return 0;
+
+
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
    * again inside the guarded section of pte_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
+/*  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       if ((result = pte_mutex_check_need_init (mutex)) != 0)
         {
@@ -87,10 +89,12 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
             1) != 0)
         {
           while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
+          //if (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
             {
-	     
-	      //nk_semaphore_down(mx->sem);
-	      ssem_wait(mx->sem);
+
+	      //sched_yield();
+	      nk_semaphore_down(mx->sem);
+	      //ssem_wait(mx->sem);
             }
         }
     }
@@ -119,9 +123,11 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
           else
             {
               while (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
+              //if (PTE_ATOMIC_EXCHANGE(&mx->lock_idx,-1) != 0)
                 {
-                   //nk_semaphore_down(mx->sem);
-		   ssem_wait(mx->sem);
+                   //sched_yield();
+                   nk_semaphore_down(mx->sem);
+		  // ssem_wait(mx->sem);
 		}
 
               if (0 == result)
@@ -134,6 +140,7 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
 
     }
   DEBUG("mx :%d, mutex:%d \n", mx->lock_idx, (*mutex)->lock_idx);
-  NK_PROFILE_EXIT();
+ NK_PROFILE_EXIT();
   return (result);
-}
+*/}
+

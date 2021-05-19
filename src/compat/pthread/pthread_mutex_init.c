@@ -60,14 +60,19 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
       return EINVAL;
     }
 
+
   mx = (pthread_mutex_t) calloc (1, sizeof (*mx));
   memset(mx, 0, sizeof(*mx));
+
   if (mx == NULL)
     {
       result = ENOMEM;
     }
   else
     {
+
+      NK_MUTEX_LOCK_INIT(mx);
+/*
       mx->lock_idx = 0;
       mx->recursive_count = 0;
       // ERROR("attr addr %08x\n", attr);
@@ -81,13 +86,14 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
       //DEBUG("pass mxkind\n");
       mx->ownerThread = NULL;
       mx->sem = malloc(sizeof(simple_sem_t));
-      //mx->sem = nk_semaphore_create(NULL, 0,0, NULL);
-      ssem_init(mx->sem,  0);
-      //pte_osSemaphoreCreate(0,&mx->handle);
-
+      mx->sem = nk_semaphore_create(NULL, 0,0, NULL);
+      //ssem_init(mx->sem,  0);
+     //pte_osSemaphoreCreate(0,&mx->handle);
+*/
     }
 
   *mutex = mx;
    NK_PROFILE_EXIT();
   return (result);
 }
+

@@ -6,20 +6,20 @@ c  in this directory. Do not modify it by hand.
 */
 
 /* full problem size */
-#define	ISIZ1	162
-#define	ISIZ2	162
-#define	ISIZ3	162
+#define ISIZ1   162
+#define ISIZ2   162
+#define ISIZ3   162
 /* number of iterations and how often to print the norm */
-#define	ITMAX_DEFAULT	250
-#define	INORM_DEFAULT	250
-#define	DT_DEFAULT	2.0
-#define	CONVERTDOUBLE	FALSE
-#define COMPILETIME "24 Mar 2021"
+#define ITMAX_DEFAULT   250
+#define INORM_DEFAULT   250
+#define DT_DEFAULT      2.0
+#define CONVERTDOUBLE   FALSE
+#define COMPILETIME "16 May 2021"
 #define NPBVERSION "3.0 structured"
-#define CS1 "(none)"
-#define CS2 "(none)"
-#define CS3 "(none)"
-#define CS4 "(none)"
-#define CS5 "-o3 $(C_IN)"
+#define CS1 "clang-10"
+#define CS2 "clang-10"
+#define CS3 "-lomp -lm"
+#define CS4 "-I../common"
+#define CS5 "-O3 -lm -fopenmp -mcmodel=large"
 #define CS6 "(none)"
-#define CS7 "(none)"
+#define CS7 "randdp"

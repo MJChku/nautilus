@@ -58,6 +58,8 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
   int result = 0;
   pthread_mutex_t mx;
 
+   NK_MUTEX_UNLOCK(*mutex);
+   return 0;
   /*
    * Let the system deal with invalid pointers.
    */
@@ -72,7 +74,7 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
    * race condition. If another thread holds the
    * lock then we shouldn't be in here.
    */
-  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
+/*  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       if (mx->kind == PTHREAD_MUTEX_NORMAL)
         {
@@ -83,18 +85,15 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
             {
               if (idx < 0)
                 {
-                  /*
-                   * Someone may be waiting on that mutex.
-                   */
-	          //nk_semaphore_up(mx->sem);
-		  ssem_post(mx->sem,1);
+                          ;
+                   //Someone may be waiting on that mutex.
+	          nk_semaphore_up(mx->sem);
+		 // ssem_post(mx->sem,1);
                 }
             }
           else
             {
-              /*
-               * Was not locked (so can't be owned by us).
-               */
+               // Was not locked (so can't be owned by us).
               result = EPERM;
             }
         }
@@ -109,8 +108,8 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 
                   if (PTE_ATOMIC_EXCHANGE (&mx->lock_idx,0) < 0)
                     {
-                       //nk_semaphore_up(mx->sem);
-		       ssem_post(mx->sem,1);
+                       nk_semaphore_up(mx->sem);
+		      // ssem_post(mx->sem,1);
                     }
                 }
             }
@@ -128,4 +127,5 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
   NK_PROFILE_EXIT();
 
   return (result);
-}
+*/}
+

@@ -64,21 +64,21 @@ static int firstcol;
 static int lastcol;
 
 /* common /main_int_mem/ */
-static int colidx[NZ+1];	/* colidx[1:NZ] */
-static int rowstr[NA+1+1];	/* rowstr[1:NA+1] */
-static int iv[2*NA+1+1];	/* iv[1:2*NA+1] */
-static int arow[NZ+1];		/* arow[1:NZ] */
-static int acol[NZ+1];		/* acol[1:NZ] */
+static int colidx[NZ+1] __attribute__((section(".nasbss"))) ;	/* colidx[1:NZ] */
+static int rowstr[NA+1+1] __attribute__((section(".nasbss"))) ;	/* rowstr[1:NA+1] */
+static int iv[2*NA+1+1] __attribute__((section(".nasbss"))) ;	/* iv[1:2*NA+1] */
+static int arow[NZ+1] __attribute__((section(".nasbss"))) ;		/* arow[1:NZ] */
+static int acol[NZ+1] __attribute__((section(".nasbss"))) ;		/* acol[1:NZ] */
 
 /* common /main_flt_mem/ */
-static double v[NA+1+1];	/* v[1:NA+1] */
-static double aelt[NZ+1];	/* aelt[1:NZ] */
-static double a[NZ+1];		/* a[1:NZ] */
-static double x[NA+2+1];	/* x[1:NA+2] */
-static double z[NA+2+1];	/* z[1:NA+2] */
-static double p[NA+2+1];	/* p[1:NA+2] */
-static double q[NA+2+1];	/* q[1:NA+2] */
-static double r[NA+2+1];	/* r[1:NA+2] */
+static double v[NA+1+1] __attribute__((section(".nasbss"))) ;	/* v[1:NA+1] */
+static double aelt[NZ+1] __attribute__((section(".nasbss"))) ;	/* aelt[1:NZ] */
+static double a[NZ+1] __attribute__((section(".nasbss"))) ;		/* a[1:NZ] */
+static double x[NA+2+1] __attribute__((section(".nasbss"))) ;	/* x[1:NA+2] */
+static double z[NA+2+1] __attribute__((section(".nasbss"))) ;	/* z[1:NA+2] */
+static double p[NA+2+1] __attribute__((section(".nasbss"))) ;	/* p[1:NA+2] */
+static double q[NA+2+1] __attribute__((section(".nasbss"))) ;	/* q[1:NA+2] */
+static double r[NA+2+1] __attribute__((section(".nasbss"))) ;	/* r[1:NA+2] */
 //static double w[NA+2+1];	/* w[1:NA+2] */
 
 /* common /urando/ */

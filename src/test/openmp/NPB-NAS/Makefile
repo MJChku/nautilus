@@ -8,6 +8,12 @@ obj-y += set_omp_num_threads.o
 #EP and MG conflicts with others
 
 #obj-y += \
+	MG/\
+	IS/\
+	EP/
+obj-y+=  FT/
+
+#obj-y += \
 	 SP/\
 	 LU/\
 	 IS/\
@@ -24,7 +30,7 @@ obj-y += set_omp_num_threads.o
 
 #--- C class LU CG and MG(MMAP/BUMP ALLOCATOR) can compile ---#
 
-obj-y += LU/
+#obj-y += LU/
 #obj-y += LU/\
 	CG/\
 	MG/

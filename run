@@ -1,2 +1,2 @@
-qemu-system-x86_64 --enable-kvm -cpu host -smp 92,cores=92 -m 50G -curses -serial file:serial1.out -serial file:serial2.out -vga std -cdrom nautilus.iso -gdb tcp::1234
+qemu-system-x86_64 --enable-kvm -cpu host -smp 48,cores=48 -m 50G -curses -serial file:serial1.out -serial file:serial2.out -vga std -cdrom nautilus.iso -gdb tcp::1234
 

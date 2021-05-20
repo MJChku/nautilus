@@ -63,7 +63,7 @@ int errno=0;
 
 // Structs needed for LUA 
 
-
+GEN_UNDEF(int, __kmp_i18n_dump_catalog, 0)
 
 static int maxExponent = 511;	/* Largest possible base 10 exponent.  Any
 				 * exponent larger than this will already

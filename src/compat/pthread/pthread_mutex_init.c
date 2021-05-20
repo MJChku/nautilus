@@ -61,8 +61,8 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
     }
 
 
-  mx = (pthread_mutex_t) calloc (1, sizeof (*mx));
-  memset(mx, 0, sizeof(*mx));
+  mx = (pthread_mutex_t) malloc(sizeof(NK_MUTEX_LOCK_T)); // (1, sizeof (*mx));
+  memset(mx, 0, sizeof(NK_MUTEX_LOCK_T));
 
   if (mx == NULL)
     {
@@ -72,7 +72,7 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
     {
 
       ERROR("initialize pthread_mutex addr %p\n", mx);
-      NK_MUTEX_LOCK_INIT(mx);
+      result = NK_MUTEX_LOCK_INIT(mx);
 /*
       mx->lock_idx = 0;
       mx->recursive_count = 0;

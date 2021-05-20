@@ -28,7 +28,6 @@ pthread_cond_init (pthread_cond_t * c, const pthread_condattr_t * attr)
     }
 
     char buf[NK_WAIT_QUEUE_NAME_LEN];
-    DEBUG("Condvar init\n");
 
     memset(c, 0, sizeof(pthread_cond_t));
 
@@ -37,8 +36,10 @@ pthread_cond_init (pthread_cond_t * c, const pthread_condattr_t * attr)
     //ssem_init(c->sem, 0);
     c->wait_queue = nk_wait_queue_create(buf);
 
-    NK_LOCK_INIT(&c->lock);
-    
+    result = NK_MUTEX_LOCK_INIT(&c->lock);
+   
+
+    DEBUG("Condvar init %p mutex %p success? %d \n", c , &c->lock, result);
     NK_PROFILE_EXIT();
     return result;
 

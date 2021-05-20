@@ -18,10 +18,10 @@ typedef uint32_t mutex;
 #define __MEM_ORDER  __ATOMIC_SEQ_CST
 #define barrier() __asm__ volatile("": : :"memory")
 #define memory_barrier() __sync_synchronize()
-void 
+int 
 mutex_init (volatile mutex * atom);
 
-void
+int
 mutex_deinit (volatile mutex * atom);
 
 static inline void

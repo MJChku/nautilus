@@ -108,8 +108,8 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
 
     NK_MUTEX_LOCK(&c->lock);
 
-    barrier();
-    memory_barrier();
+   // barrier();
+  //  memory_barrier();
     /* now we can unlock the mutex and go to sleep */
     pthread_mutex_unlock(l);
 
@@ -124,15 +124,13 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
     do {
 
         NK_MUTEX_UNLOCK(&c->lock);
-	barrier();
-        memory_barrier();
-    DEBUG("Condvar before ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
+//    DEBUG("Condvar before ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 //	ssem_wait(c->sem);
-    nk_wait_queue_sleep(c->wait_queue);
+       nk_wait_queue_sleep(c->wait_queue);
       
         barrier();
 //    DEBUG("Condvar after ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
-	NK_LOCK(&c->lock);
+	NK_MUTEX_LOCK(&c->lock);
 
         if (bc != *(volatile unsigned*)&(c->bcast_seq)) {
             goto bcout;

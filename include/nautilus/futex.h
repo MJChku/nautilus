@@ -19,7 +19,7 @@ struct futex {
 };
 
 static int futex_inited = 0;
-static spinlock_t futex_lock;
+static NK_LOCK_T futex_lock;
 
 static struct futex futex_pool[NUM_FUTEXES];
 
@@ -27,7 +27,7 @@ static int futex_init() {
   if (!futex_inited) {
     int i;
     char buf[80];
-    spinlock_init(&futex_lock);
+    NK_LOCK_INIT(&futex_lock);
     for (i = 0; i < NUM_FUTEXES; i++) {
       futex_pool[i].uaddr = 0;
       futex_pool[i].val = 0;

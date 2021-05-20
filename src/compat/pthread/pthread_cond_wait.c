@@ -125,8 +125,8 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
 
         NK_MUTEX_UNLOCK(&c->lock);
 //    DEBUG("Condvar before ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
-//	ssem_wait(c->sem);
-       nk_wait_queue_sleep(c->wait_queue);
+	ssem_wait(c->sem);
+//       nk_wait_queue_sleep(c->wait_queue);
       
         barrier();
 //    DEBUG("Condvar after ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);

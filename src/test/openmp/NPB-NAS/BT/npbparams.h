@@ -6,9 +6,9 @@ c  in this directory. Do not modify it by hand.
 */
 
 
-#define	PROBLEM_SIZE	12
-#define	NITER_DEFAULT   60
-#define	DT_DEFAULT	0.010
+#define	PROBLEM_SIZE	102
+#define	NITER_DEFAULT   200
+#define	DT_DEFAULT	0.00030
 #define	CONVERTDOUBLE	FALSE
 #define COMPILETIME "21 Sep 2020"
 #define NPBVERSION "3.0 structured"

@@ -4,7 +4,7 @@
 #include <nautilus/nautilus.h>
 #include <nautilus/waitqueue.h>
 #include <nautilus/linux_futex.h>
-#define NUM_FUTEXES 512
+#define NUM_FUTEXES 2048
 
 #define FUTEX_WAIT 0
 #define FUTEX_WAKE 1

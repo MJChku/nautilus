@@ -58,6 +58,7 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
   int result = 0;
   pthread_mutex_t mx;
 
+   DEBUG("mutex unlock : %p \n", *mutex);
    NK_MUTEX_UNLOCK(*mutex);
    return 0;
   /*

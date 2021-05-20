@@ -5,10 +5,10 @@
 #define WARN(fmt, args...) WARN_PRINT(SYSCALL_NAME ": " fmt, ##args)
 #define DEBUG(fmt, args...) DEBUG_PRINT(SYSCALL_NAME ": " fmt, ##args)
 #define INFO(fmt, args...) INFO_PRINT(SYSCALL_NAME ": " fmt, ##args)
-
+/*
 #undef DEBUG
 #define DEBUG 
-
+*/
 uint64_t sys_futex(uint32_t* uaddr, int op, uint32_t val,
                    /*(struct timespec*)*/ void* utime, uint32_t* uaddr2,
                    uint32_t val3) {

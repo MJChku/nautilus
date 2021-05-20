@@ -70,10 +70,10 @@ c   and l2norm are similarly padded
 c-------------------------------------------------------------------*/
 
 /* common /cvar/ */
-static double u[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5] __attribute__((section(".nasbss")));
-static double rsd[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5] __attribute__((section(".nasbss"))) ;
-static double frct[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5] __attribute__((section(".nasbss")));
-static double flux[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5] __attribute__((section(".nasbss"))) ;
+static double u[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5];
+static double rsd[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5];
+static double frct[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5];
+static double flux[ISIZ1][ISIZ2/2*2+1][ISIZ3/2*2+1][5];
 
 /*--------------------------------------------------------------------
 c   output control parameters
@@ -91,10 +91,10 @@ static int itmax, invert;
 static double dt, omega, tolrsd[5], rsdnm[5], errnm[5], frc, ttotal;
   
 /* common /cjac/ */
-static double a[ISIZ1][ISIZ2][5][5] __attribute__((section(".nasbss"))) ;
-static double b[ISIZ1][ISIZ2][5][5] __attribute__((section(".nasbss"))) ;
-static double c[ISIZ1][ISIZ2][5][5] __attribute__((section(".nasbss")));
-static double d[ISIZ1][ISIZ2][5][5] __attribute__((section(".nasbss")));
+static double a[ISIZ1][ISIZ2][5][5] ;
+static double b[ISIZ1][ISIZ2][5][5] ;
+static double c[ISIZ1][ISIZ2][5][5] ;
+static double d[ISIZ1][ISIZ2][5][5]; 
 
 /*--------------------------------------------------------------------
 c   coefficients of the exact solution

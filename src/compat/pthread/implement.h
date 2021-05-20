@@ -58,6 +58,7 @@
 #include "sched.h"
 #include <nautilus/spinlock.h>
 #include <nautilus/waitqueue.h>
+#include <nautilus/mutex.h>
 
 typedef enum
 {
@@ -260,7 +261,8 @@ struct ThreadParms
 
 struct nk_pthread_cond_t_
 {
-    NK_LOCK_T lock;
+    //NK_LOCK_T lock;
+    NK_MUTEX_LOCK_T lock;
     //simple_sem_t* sem; 
     nk_wait_queue_t * wait_queue;
     unsigned nwaiters;

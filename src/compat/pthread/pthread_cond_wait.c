@@ -25,7 +25,8 @@ int
 pthread_cond_timedwait (pthread_cond_t * c,
                     pthread_mutex_t * l, const struct timespec *abstime)
 {
-    
+
+    nk_vc_printf("ERROR: timed wait not expected \n");	
     return EINVAL;
     NK_PROFILE_ENTRY();
     int result = 0;
@@ -92,6 +93,9 @@ bcout:
     return result;
 }
 
+#define barrier() __asm__ volatile("": : :"memory")
+#define memory_barrier() __sync_synchronize()
+
 int
 pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
 {
@@ -102,8 +106,10 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
     }
     DEBUG("Condvar wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 
-    NK_LOCK(&c->lock);
+    NK_MUTEX_LOCK(&c->lock);
 
+    barrier();
+    memory_barrier();
     /* now we can unlock the mutex and go to sleep */
     pthread_mutex_unlock(l);
 
@@ -117,19 +123,24 @@ pthread_cond_wait (pthread_cond_t * c, pthread_mutex_t * l)
 
     do {
 
-        NK_UNLOCK(&c->lock);
-	
+        NK_MUTEX_UNLOCK(&c->lock);
+	barrier();
+        memory_barrier();
     DEBUG("Condvar before ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 //	ssem_wait(c->sem);
     nk_wait_queue_sleep(c->wait_queue);
       
-    DEBUG("Condvar after ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
+        barrier();
+//    DEBUG("Condvar after ssem wait on (%p) mutex=%p\n", (void*)c, (void*)l);
 	NK_LOCK(&c->lock);
 
         if (bc != *(volatile unsigned*)&(c->bcast_seq)) {
             goto bcout;
         }
 
+	barrier();
+
+        memory_barrier();
         val = *(volatile unsigned long long*)&(c->wakeup_seq);
    } while (val == seq || val == *(volatile unsigned long long*)&(c->woken_seq));
 
@@ -139,8 +150,10 @@ bcout:
 
     --c->nwaiters;
 
-    NK_UNLOCK(&c->lock);
+    NK_MUTEX_UNLOCK(&c->lock);
 
+    memory_barrier();
+    barrier();
     /* reacquire lock */
     pthread_mutex_lock(l);
 

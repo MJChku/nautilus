@@ -60,6 +60,7 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
       return EINVAL;
     }
 
+   DEBUG("mutex lock addr %p \n", *mutex);
    NK_MUTEX_LOCK(*mutex);
    return 0;
 

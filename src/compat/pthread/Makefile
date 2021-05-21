@@ -1,7 +1,7 @@
 NK_LIB =\
 	nk/\
-	simple_sem/
-
+	simple_sem/\
+        astore.o
 MUTEX_OBJS = \
   pthread_mutex_unlock.o \
   pthread_mutex_init.o \

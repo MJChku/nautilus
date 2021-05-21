@@ -48,7 +48,7 @@ pthread_setcancelstate (int state, int *oldstate)
  * ------------------------------------------------------
  */
 {
-  BOGUS();
+ // BOGUS();
   return 0;
   
   /* int result = 0; */

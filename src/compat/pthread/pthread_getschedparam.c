@@ -48,6 +48,8 @@ int
 pthread_getschedparam (pthread_t thread, int *policy,
                        struct sched_param *param)
 {
+
+  BOGUS();
   int result;
 
   /* Validate the thread id. */

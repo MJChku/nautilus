@@ -47,5 +47,6 @@
 int
 pthread_getconcurrency (void)
 {
+  BOGUS();
   return pte_concurrency;
 }

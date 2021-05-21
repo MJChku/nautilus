@@ -71,7 +71,7 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
   else
     {
 
-      ERROR("initialize pthread_mutex addr %p\n", mx);
+//      ERROR("initialize pthread_mutex addr %p\n", mx);
       result = NK_MUTEX_LOCK_INIT(mx);
 /*
       mx->lock_idx = 0;

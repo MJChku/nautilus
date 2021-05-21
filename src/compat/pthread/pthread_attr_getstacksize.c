@@ -83,7 +83,7 @@ pthread_attr_getstacksize (const pthread_attr_t * attr, size_t * stacksize)
  */
 {
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
-
+  //BOGUS();
   if (pte_is_attr (attr) != 0)
     {
       return EINVAL;

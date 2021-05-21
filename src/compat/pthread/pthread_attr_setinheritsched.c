@@ -47,6 +47,7 @@
 int
 pthread_attr_setinheritsched (pthread_attr_t * attr, int inheritsched)
 {
+BOGUS();
   if (pte_is_attr (attr) != 0)
     {
       return EINVAL;

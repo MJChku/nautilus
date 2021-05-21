@@ -81,6 +81,7 @@ pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
  * ------------------------------------------------------
  */
 {
+ // BOGUS();
   if (pte_is_attr (attr) != 0)
     {
       return EINVAL;
@@ -91,6 +92,10 @@ pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
     {
       return EINVAL;
     }
+ 
+  if(detachstate){
+     ERROR("WRONG: you did wrong here \n");
+  }
 
   (*attr)->detachstate = detachstate;
   return 0;

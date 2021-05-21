@@ -47,6 +47,7 @@
 int
 pthread_attr_getscope (const pthread_attr_t * attr, int *contentionscope)
 {
+  BOGUS();
 #ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
   *contentionscope = (*attr)->contentionscope;
   return 0;

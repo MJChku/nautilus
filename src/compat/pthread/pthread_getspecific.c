@@ -34,6 +34,7 @@ pthread_getspecific (pthread_key_t key)
  * ------------------------------------------------------
  */
 {
+//  BOGUS();
 
   return nk_tls_get(key);	
   /* void * ptr; */

@@ -72,6 +72,7 @@ pthread_attr_destroy (pthread_attr_t * attr)
  * ------------------------------------------------------
  */
 {
+	
   if (pte_is_attr (attr) != 0)
     {
       return EINVAL;

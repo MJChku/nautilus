@@ -86,6 +86,8 @@ pthread_attr_setstacksize (pthread_attr_t * attr, size_t stacksize)
  * ------------------------------------------------------
  */
 {
+
+//BOGUS();
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
 
 #if PTHREAD_STACK_MIN > 0

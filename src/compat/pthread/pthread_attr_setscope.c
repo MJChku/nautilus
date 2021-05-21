@@ -48,6 +48,7 @@ int
 pthread_attr_setscope (pthread_attr_t * attr, int contentionscope)
 {
 #ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+	BOGUS();
   switch (contentionscope)
     {
     case PTHREAD_SCOPE_SYSTEM:

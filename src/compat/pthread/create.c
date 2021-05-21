@@ -6,6 +6,7 @@
 #include "pthread.h"
 #include "implement.h"
 #include <nautilus/nautilus.h>
+#include "astore.h"
 
 static int COUNT=0;
 int
@@ -25,7 +26,7 @@ pthread_create (pthread_t * ptid,
   DEBUG("thread create and start\n");	
   NK_PROFILE_ENTRY();
 
-  register pthread_attr_t a;
+  pthread_attr_t a;
   
   int result = EAGAIN, detach_state=0, priority=0;
   long stack_size;
@@ -72,8 +73,33 @@ if ((parms = (thread_parms *) malloc (sizeof (*parms))) == NULL)
 
   struct sys_info *sys = per_cpu_get(system);
   int cpu_num = (++COUNT)% sys->num_cpus;
+ 
+   
+  int ret = nk_thread_start((void*)(&pte_thread_start), parms, NULL, detach_state, (nk_stack_size_t)stack_size, ptid, cpu_num);
   
-  int ret = nk_thread_start((void*)(&pte_thread_start), parms, NULL, 0, (nk_stack_size_t)stack_size, ptid, cpu_num);
+  if(a == NULL){
+   
+    ERROR("pthread attr is NULL hence give up\n");
+    result = 1;
+    goto FAIL0;
+  }
+  if(a!=NULL){
+
+    // debug_print(a);	  
+     int ans = attr_store(*ptid, a);
+/*
+     pthread_attr_t _tmp = attr_retrieve(*ptid);
+
+     if(!_tmp ) return  1;
+     debug_print(_tmp);
+*/
+    if(ans!=0){
+       ERROR("thread store attr error");
+       result = 1;
+       goto FAIL0;
+    }
+  }
+
   if (ret != 0){
     ERROR("create error exit\n");
     osResult = PTE_OS_NO_RESOURCES;

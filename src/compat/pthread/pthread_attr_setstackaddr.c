@@ -86,6 +86,7 @@ pthread_attr_setstackaddr (pthread_attr_t * attr, void *stackaddr)
  */
 {
 #if defined( _POSIX_THREAD_ATTR_STACKADDR )
+	BOGUS();
 
   if (pte_is_attr (attr) != 0)
     {

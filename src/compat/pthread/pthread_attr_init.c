@@ -74,6 +74,7 @@ pthread_attr_init (pthread_attr_t * attr)
  * ------------------------------------------------------
  */
 {
+ // BOGUS();
   NK_PROFILE_ENTRY();
   pthread_attr_t attr_result;
 

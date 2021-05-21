@@ -47,6 +47,7 @@
 int
 pthread_setconcurrency (int level)
 {
+  BOGUS();
   if (level < 0)
     {
       return EINVAL;

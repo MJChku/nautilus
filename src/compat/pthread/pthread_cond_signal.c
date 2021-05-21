@@ -29,9 +29,9 @@ pthread_cond_signal (pthread_cond_t * c)
 	barrier();
 	memory_barrier();
         DEBUG("Condvar signaling on (%p)\n", (void*)c);
-	//nk_wait_queue_wake_one(c->wait_queue);
+	nk_wait_queue_wake_one(c->wait_queue);
 
-	ssem_post(c->sem,1);
+	//ssem_post(c->sem,1);
 
     } 
 
@@ -68,9 +68,9 @@ pthread_cond_broadcast (pthread_cond_t * c)
 
 	barrier();
 	memory_barrier();
-//	 nk_wait_queue_wake_all(c->wait_queue);
+	nk_wait_queue_wake_all(c->wait_queue);
 
-        ssem_post(c->sem, c->nwaiters);
+//        ssem_post(c->sem, c->nwaiters);
         NK_PROFILE_EXIT();
 	//nk_wait_queue_wake_all(c->wait_queue);
         return 0;

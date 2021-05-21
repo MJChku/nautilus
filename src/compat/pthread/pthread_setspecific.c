@@ -35,6 +35,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
  * ------------------------------------------------------
  */
 {
+//  BOGUS();
   return nk_tls_set(key, value);
   
   /* pthread_t self; */

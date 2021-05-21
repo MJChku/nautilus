@@ -53,6 +53,7 @@ int
 pthread_attr_getschedparam (const pthread_attr_t * attr,
                             struct sched_param *param)
 {
+  BOGUS();	
   if (pte_is_attr (attr) != 0 || param == NULL)
     {
       return EINVAL;

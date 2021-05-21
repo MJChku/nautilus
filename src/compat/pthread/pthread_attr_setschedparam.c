@@ -53,6 +53,7 @@ int
 pthread_attr_setschedparam (pthread_attr_t * attr,
                             const struct sched_param *param)
 {
+  BOGUS();
   int priority;
 
   if (pte_is_attr (attr) != 0 || param == NULL)

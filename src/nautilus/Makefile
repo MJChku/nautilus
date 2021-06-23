@@ -1,4 +1,5 @@
 obj-y += \
+	first_touch_patch.o \
 	futex.o\
 	mutex.o\
 	fmtout.o \

@@ -32,6 +32,7 @@
 #include <nautilus/list.h>
 #include <nautilus/printk.h>
 #include <nautilus/spinlock.h>
+#include <nautilus/mb_utils.h>
 
 #include <acpi/acpi.h>
 
@@ -75,12 +76,19 @@ void acpi_os_vprintf(const char *fmt, va_list args)
 
 acpi_physical_address acpi_os_get_root_pointer(void)
 {
-	{
-		acpi_physical_address pa = 0;
+    acpi_physical_address pa = 0;
 
-		acpi_find_root_pointer(&pa);
-		return pa;
-	}
+    pa = (acpi_physical_address)mb_get_rsdp();
+
+    if (pa) {
+        acpi_os_printf("Using bootloader's RSDP pointer\n");
+        return pa;
+    }
+
+    acpi_os_printf("Reverting to ACPI table search\n");
+
+    acpi_find_root_pointer(&pa);
+    return pa;
 }
 
 

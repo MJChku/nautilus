@@ -101,6 +101,8 @@ gig_pages_supported (void)
 static page_size_t
 largest_page_size (void)
 {
+	
+    return PS_2M;
     if (gig_pages_supported()) {
         return PS_1G;
     }
@@ -323,6 +325,7 @@ nk_map_page_nocache (addr_t paddr, uint64_t flags, page_size_t ps)
  * page fault handler
  *
  */
+/*
 int
 nk_pf_handler (excp_entry_t * excp,
                excp_vec_t     vector,
@@ -367,6 +370,7 @@ nk_pf_handler (excp_entry_t * excp,
     panic("+++ HALTING +++\n");
     return 0;
 }
+*/
 
 
 /*

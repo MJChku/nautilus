@@ -54,7 +54,7 @@
 /* common /storage/ */
 static double x[2*NK];
 #pragma omp threadprivate(x)
-static double q[NQ];
+static double q[NQ] ;
 
 /*--------------------------------------------------------------------
       program EMBAR

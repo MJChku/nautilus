@@ -6,9 +6,9 @@ c  in this directory. Do not modify it by hand.
 */
 
 /* full problem size */
-#define	ISIZ1	102
-#define	ISIZ2	102
-#define	ISIZ3	102
+#define	ISIZ1	162
+#define	ISIZ2	162
+#define	ISIZ3	162
 /* number of iterations and how often to print the norm */
 #define	ITMAX_DEFAULT	250
 #define	INORM_DEFAULT	250

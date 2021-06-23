@@ -39,6 +39,22 @@ multiboot_get_size (ulong_t mbd)
 }
 
 
+static void * old_rsdp = NULL;
+static void * new_rsdp = NULL;
+void * mb_get_rsdp (void)
+{
+    if (new_rsdp) {
+        DEBUG_PRINT("Using ACPI 2.0 RSDP from Multiboot2\n");
+        return new_rsdp;
+    } else if (old_rsdp) {
+        DEBUG_PRINT("Using ACPI 1.0 RSDP from Multiboot2\n");
+        return old_rsdp;
+    }
+
+    DEBUG_PRINT("No ACPI RSDP found from Multiboot2\n");
+    return NULL;
+}
+
 
 /* 
  * Returns total physical memory in BYTES
@@ -264,10 +280,12 @@ multiboot_parse (ulong_t mbd, ulong_t magic)
                                                    }
             case MULTIBOOT_TAG_TYPE_FRAMEBUFFER: {
                 struct multiboot_tag_framebuffer_common * fb = (struct multiboot_tag_framebuffer_common*)tag;
-                DEBUG_PRINT("fb addr: %p, fb_width: %u, fb_height: %u\n", 
+                DEBUG_PRINT("fb addr: %p, fb_width: %u, fb_height: %u, type: %u\n",
                         (void*)fb->framebuffer_addr,
                         fb->framebuffer_width,
-                        fb->framebuffer_height);
+                        fb->framebuffer_height,
+                        fb->framebuffer_type);
+                nk_low_level_memcpy(&(mb_info->fb_info), (char*)fb, fb->size);
                 break;
                                                  }
             case MULTIBOOT_TAG_TYPE_CMDLINE: {
@@ -286,11 +304,15 @@ multiboot_parse (ulong_t mbd, ulong_t magic)
 			case MULTIBOOT_TAG_TYPE_ACPI_OLD: {
 				struct multiboot_tag_old_acpi * oacpi = (struct multiboot_tag_old_acpi*)tag;
 				DEBUG_PRINT("Old ACPI: rsdp=%p\n", oacpi->rsdp);
+                mb_info->acpi_1dot0_rsdp = &(oacpi->rsdp);
+                old_rsdp = &(oacpi->rsdp);
 				break;
 											  }
 			case MULTIBOOT_TAG_TYPE_ACPI_NEW: {
 				struct multiboot_tag_new_acpi * nacpi = (struct multiboot_tag_new_acpi*)tag;
 				DEBUG_PRINT("New ACPI: rsdp=%p\n", nacpi->rsdp);
+                mb_info->acpi_2dot0_rsdp = &(nacpi->rsdp);
+                new_rsdp = &(nacpi->rsdp);
 				break;
 							  }
             case MULTIBOOT_TAG_TYPE_IMAGE_BASE: {

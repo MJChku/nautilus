@@ -625,11 +625,11 @@ init (unsigned long mbd,
     nk_thread_group_init();
     nk_group_sched_init();
 
+
     /* we now switch away from the boot-time stack in low memory */
     naut = smp_ap_stack_switch(get_cur_thread()->rsp, get_cur_thread()->rsp, naut);
 
     mm_boot_kmem_cleanup();
-
 
     smp_setup_xcall_bsp(naut->sys.cpus[0]);
 
@@ -668,7 +668,7 @@ init (unsigned long mbd,
 
     // reinit the early-initted devices now that
     // we have malloc and the device framework functional
-    vga_init();
+    vga_init(naut->sys.mb_info);
     serial_init();
 
     nk_sched_start();

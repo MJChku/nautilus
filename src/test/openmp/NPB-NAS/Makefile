@@ -7,6 +7,13 @@ obj-y += common/\
 obj-y += set_omp_num_threads.o
 #EP and MG conflicts with others
 
+obj-y += \
+	EP/\
+	CG/\
+	MG/
+
+#obj-y+=  FT/
+
 #obj-y += \
 	 SP/\
 	 LU/\
@@ -24,6 +31,7 @@ obj-y += set_omp_num_threads.o
 
 #--- C class LU CG and MG(MMAP/BUMP ALLOCATOR) can compile ---#
 
+#obj-y += LU/
 #obj-y += LU/\
 	CG/\
 	MG/
@@ -35,7 +43,7 @@ obj-y += set_omp_num_threads.o
 
 #--- B class FT can compile only by itself ---#
 
-obj-y += FT/
+#obj-y += FT/
 
 #--- C class IS should be configured with large stack size (> 16MB) ---#
 

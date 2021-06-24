@@ -7,6 +7,7 @@
 /* #include <stdlib.h> */
 
 #include<nautilus/nautilus.h>
+#include <nautilus/first_touch_patch.h>
 //#include<nautilus/math.h>
 
 //#include <math.h>

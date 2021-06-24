@@ -92,15 +92,28 @@ static void verify(double xcr[5], double xce[5], double xci,
 
 static int program_LU(char *_buf, void* _priv);
 
+static int program_LU_profile(char *_, void *__);
+
 static struct shell_cmd_impl nas_lu_impl = {
     .cmd      = "nas-lu",
     .help_str = "NAS parallel benchmark LU",
-    .handler  = program_LU,
+    .handler  = program_LU_profile,
 };
 nk_register_shell_cmd(nas_lu_impl);
 
+
 int program_LU_profile(char *_, void *__){
+    
+      	extern addr_t _nasbssStart, _nasbssEnd;
+
+      addr_t bssStart = (addr_t) &_nasbssStart;
+      addr_t bssEnd = (addr_t) &_nasbssEnd;
+
+      printf("bssStart %p\n", bssStart);
+      memset(bssStart, 0, bssEnd-bssStart);
    
+//      nk_invalidate_4gb_to_8gb_pages();
+
 #ifdef NAUT_CONFIG_PROFILE
       nk_instrument_clear();
       nk_instrument_start();

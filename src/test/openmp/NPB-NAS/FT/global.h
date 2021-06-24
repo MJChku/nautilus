@@ -90,7 +90,7 @@ static int zend[3];
 #define	EXPMAX	(NITER_DEFAULT*(NX*NX/4+NY*NY/4+NZ*NZ/4))
 
 /* COMMON block: excomm */
-static double ex[EXPMAX+1];	/* ex(0:expmax) */
+static double ex[EXPMAX+1] __attribute__((section(".nasbss"))) ;	/* ex(0:expmax) */
 
 /*
 c roots of unity array
@@ -98,12 +98,12 @@ c relies on x being largest dimension?
 */
 
 /* COMMON block: ucomm */
-static dcomplex u[NX];
+static dcomplex u[NX] __attribute__((section(".nasbss"))); 
 
 /* for checksum data */
 
 /* COMMON block: sumcomm */
-static dcomplex sums[NITER_DEFAULT+1]; /* sums(0:niter_default) */
+static dcomplex sums[NITER_DEFAULT+1] __attribute__((section(".nasbss"))) ; /* sums(0:niter_default) */
 
 /* number of iterations*/
 

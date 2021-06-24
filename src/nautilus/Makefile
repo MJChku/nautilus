@@ -1,4 +1,5 @@
 obj-y += \
+	first_touch_patch.o \
 	fmtout.o \
 	printk.o \
 	doprnt.o \

@@ -109,13 +109,13 @@ c heap rather than the stack. This common block is not
 c referenced directly anywhere else. Padding is to avoid accidental 
 c cache problems, since all array sizes are powers of two.
 c-------------------------------------------------------------------*/
-    static dcomplex u0[NZ][NY][NX];
+    static dcomplex u0[NZ][NY][NX] __attribute__((section(".nasbss")));
     static dcomplex pad1[3];
-    static dcomplex u1[NZ][NY][NX];
+    static dcomplex u1[NZ][NY][NX] __attribute__((section(".nasbss")));
     static dcomplex pad2[3];
-    static dcomplex u2[NZ][NY][NX];
+    static dcomplex u2[NZ][NY][NX] __attribute__((section(".nasbss")));
     static dcomplex pad3[3];
-    static int indexmap[NZ][NY][NX];
+    static int indexmap[NZ][NY][NX] __attribute__((section(".nasbss"))); 
     
     int iter;
     int nthreads = 1;
@@ -271,7 +271,7 @@ c-------------------------------------------------------------------*/
 
     int k;
     double x0, start, an, dummy;
-    static double tmp[NX*2*MAXDIM+1];
+    static double tmp[NX*2*MAXDIM+1] __attribute__((section(".nasbss")));
     int i,j,t;
       
     start = SEED;

@@ -24,14 +24,14 @@ c-------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------*/
 /* common /mg3/ */
-static int nx[MAXLEVEL+1], ny[MAXLEVEL+1], nz[MAXLEVEL+1];
+static int nx[MAXLEVEL+1] __attribute__((section(".nasbss"))) , ny[MAXLEVEL+1] __attribute__((section(".nasbss"))) , nz[MAXLEVEL+1] __attribute__((section(".nasbss"))) ;
 /* common /ClassType/ */
 static char Class;
 /* common /my_debug/ */
 static int debug_vec[8];
 /* common /fap/ */
 /*static int ir[MAXLEVEL], m1[MAXLEVEL], m2[MAXLEVEL], m3[MAXLEVEL];*/
-static int m1[MAXLEVEL+1], m2[MAXLEVEL+1], m3[MAXLEVEL+1];
+static int m1[MAXLEVEL+1] __attribute__((section(".nasbss"))) , m2[MAXLEVEL+1] __attribute__((section(".nasbss"))) , m3[MAXLEVEL+1] __attribute__((section(".nasbss"))) ;
 static int lt, lb;
 
 /*c---------------------------------------------------------------------
